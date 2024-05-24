@@ -1,4 +1,5 @@
 const express = require('express')
+const db = require('./src/dao/sqldao.js')
 
 const app = express()
 
@@ -17,6 +18,29 @@ app.get('/api/info', (req, res) => {
     }
     res.json(info)
 })
+
+app.get('/api/user', (req, res) => {
+    console.log('GET /api/user');
+
+    db.getConnection(function (err, connection) {
+        if (err) {
+            console.error('Error getting a database connection:', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        }
+
+        connection.query('SELECT Name FROM User', function (error, results, fields) {
+            connection.release();
+
+            if (error) {
+                console.error('Error executing query:', error);
+                res.status(500).json({ error: 'Database Query Error' });
+            } else {
+                res.json(results);
+            }
+        });
+    });
+});
 
 
 // Route error handler
