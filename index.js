@@ -20,13 +20,39 @@ app.get('/api/info', (req, res) => {
 });
 
 // Route to get all users
-app.get('/api/user', async (req, res) => {
-    console.log('GET /api/user');
+app.get('/user/all', async (req, res) => {
+    console.log('GET /user/all');
 
     try {
         const pool = await poolPromise;
         const result = await pool.request().query('SELECT * FROM [User]');
         res.json(result.recordset);
+    } catch (error) {
+        console.error('Database query error:', error);
+        res.status(500).json({ error: 'Database Query Error' });
+    }
+});
+
+// Add workshop
+app.post('/workshop', async (req, res) => {
+    console.log('POST /workshop');
+
+    const body = req.body
+
+    const name = body.name
+    const category = body.category
+    const requirements = body.requirements
+    const description = body.description
+
+    try {
+        const pool = await poolPromise;
+        querytodatabase = (`INSERT INTO [Workshop] VALUES ('${name}', '${category}', '${requirements}', '${description}')`)
+        console.log('EXECUTING QUERY ON DATABASE: ')
+        console.log(querytodatabase)
+        res.json({
+            status: 200,
+            message: "Succesfully added workshop"
+        });
     } catch (error) {
         console.error('Database query error:', error);
         res.status(500).json({ error: 'Database Query Error' });

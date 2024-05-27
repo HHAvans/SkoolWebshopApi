@@ -1,10 +1,3 @@
-USE master; 
-/* Dit voorkomt dat de database gebruikt wordt tijdens verwijdering. */
-ALTER DATABASE [SkoolWorkshop] set single_user with rollback immediate 
-
-DROP DATABASE IF EXISTS SkoolWorkshop;
-CREATE DATABASE SkoolWorkshop;
-
 USE SkoolWorkshop;
 
 DROP TABLE IF EXISTS "User";
@@ -30,23 +23,11 @@ CREATE TABLE "User" (
 	CONSTRAINT CHK_Permission CHECK (Permission = 'Default' OR Permission = 'Moderator' OR Permission = 'Admin')
 )
 
-
-
-
-
-
-/* USER FOR ACCES */
--- Step 1: Create the login
-DROP LOGIN SkoolWorkshopAdmin;
-
--- Step 1: Create the login
-CREATE LOGIN SkoolWorkshopAdmin WITH PASSWORD = '6p&3YYD3#y';
-
--- Step 2: Create the user in the specific database
-USE SkoolWorkshop;
-DROP USER IF EXISTS SkoolWorkshopAdmin;
-CREATE USER SkoolWorkshopAdmin FOR LOGIN SkoolWorkshopAdmin;
-
--- Step 3: Grant read and write privileges to the specific database
-ALTER ROLE db_datareader ADD MEMBER SkoolWorkshopAdmin;
-ALTER ROLE db_datawriter ADD MEMBER SkoolWorkshopAdmin;
+DROP TABLE IF EXISTS "Workshop";
+CREATE TABLE Workshop (
+	ID						INTEGER			NOT NULL	PRIMARY KEY IDENTITY(1,1),
+	Name					NVARCHAR(64)	NOT NULL						,
+	Category				NVARCHAR(64)	NOT NULL						,
+	Requirements			NVARCHAR(4000)	NOT NULL						,
+	Description				NVARCHAR(4000)	NOT NULL						,
+)
