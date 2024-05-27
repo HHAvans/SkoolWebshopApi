@@ -1,7 +1,7 @@
 const mysql = require('mysql2')
 
 const dbConfig = {
-    host: '145.49.10.190',
+    host: '145.49.9.132',
     port: 3306,
     user: 'remote_user',
     password: 'secret',

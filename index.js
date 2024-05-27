@@ -1,10 +1,12 @@
 const express = require('express')
 const db = require('./src/dao/sqldao.js')
-
+const cors = require('cors')
 const app = express()
+
 
 // express.json zorgt dat we de body van een request kunnen lezen
 app.use(express.json())
+app.use(cors())
 
 const port = 300
 
