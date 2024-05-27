@@ -1,19 +1,35 @@
-const mysql = require('mysql2')
+require('dotenv').config();
+const sql = require('mssql');
 
 const dbConfig = {
-    host: '145.49.9.132',
-    port: 3306,
-    user: 'remote_user',
-    password: 'secret',
-    database: 'skoolworkshop',
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    server: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT, 10),
+    database: process.env.DB_DATABASE,
+    options: {
+        encrypt: false, // true if you're on Azure or need encryption
+        enableArithAbort: true
+    },
+    pool: {
+        max: 10,
+        min: 0,
+        idleTimeoutMillis: 30000
+    }
+};
 
-    connectionLimit: 10,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-    multipleStatements: true
-}
+const poolPromise = new sql.ConnectionPool(dbConfig)
+    .connect()
+    .then(pool => {
+        console.log('Connected to SQL Server');
+        return pool;
+    })
+    .catch(err => {
+        console.error('Database Connection Failed! Bad Config: ', err);
+        throw err;
+    });
 
-const pool = mysql.createPool(dbConfig)
-
-module.exports = pool
+module.exports = {
+    sql,
+    poolPromise
+};
