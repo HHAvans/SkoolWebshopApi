@@ -38,3 +38,20 @@ CREATE TABLE Workshop (
 	Requirements			NVARCHAR(4000)	NOT NULL								,
 	Description				NVARCHAR(4000)	NOT NULL								,
 )
+
+DROP TABLE IF EXISTS "Client";
+CREATE TABLE Client (
+	ClientId				INTEGER			NOT NULL	PRIMARY KEY IDENTITY(1,1)	,
+	ClientName				NVARCHAR(100)	NOT NULL	,
+	Organisation			NVARCHAR(100)	NOT NULL	,
+	TargetAudience			NVARCHAR(100)	NOT NULL	,
+	Email					NVARCHAR(100)	NOT NULL	,
+	PhoneNumber				NVARCHAR(100)	NULL		,
+	ContactPerson			NVARCHAR(100)	NOT NULL	,
+	Address					NVARCHAR(100)	NOT NULL	,
+	KvkNumber				INT				NULL
+);
+
+INSERT INTO Client VALUES (
+	'Avans Hogeschool', 'Avans Hogeschool B.V', 'Studenten', 'avans@hogeschool.com', '+3163332552', 'Marjolein Gerdes', 'Lovensdijkstraat 61', '324212'
+)
