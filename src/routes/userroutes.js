@@ -9,7 +9,14 @@ router.get('/all', async (req, res) => {
     try {
         const pool = await poolPromise;
         const result = await pool.request().query('SELECT * FROM [User]');
-        res.json(result.recordset);
+
+         // Remove the 'id' property from each user
+         const usersWithoutId = result.recordset.map(user => {
+            const { UserId, ...userWithoutId } = user;
+            return userWithoutId;
+        });
+
+        res.json(usersWithoutId);
     } catch (error) {
         console.error('Database query error:', error);
         res.status(500).json({ error: 'Database Query Error' });
