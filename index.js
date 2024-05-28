@@ -12,9 +12,11 @@ const port = 300;
 //Other routes
 const userRoutes = require('./src/routes/userroutes.js')
 const workshopRoutes = require('./src/routes/workshoproutes.js')
+const authenticationRoutes = require('./src/routes/authenticationroutes.js')
 
 app.use('/user', userRoutes)
 app.use('/workshop', workshopRoutes)
+app.use('/auth', authenticationRoutes)
 
 
 // Simple route for testing

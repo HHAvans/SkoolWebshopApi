@@ -16,8 +16,7 @@ router.post('/add', async (req, res) => {
     try {
         const pool = await poolPromise;
         querytodatabase = (`INSERT INTO [Workshop] VALUES ('${name}', '${category}', '${requirements}', '${description}')`)
-        console.log('EXECUTING QUERY ON DATABASE: ')
-        console.log(querytodatabase)
+        console.log('EXECUTING QUERY ON DATABASE: ' + querytodatabase)
         const result = await pool.request().query(querytodatabase)
         res.json({
             status: 200,

@@ -8,6 +8,7 @@ router.get('/all', async (req, res) => {
 
     try {
         const pool = await poolPromise;
+        console.log('EXECUTING QUERY ON DATABASE: SELECT * FROM [User]')
         const result = await pool.request().query('SELECT * FROM [User]');
 
          // Remove the 'id' property from each user

@@ -7,7 +7,7 @@ CREATE TABLE "User" (
 	Birthdate				DATE			NOT NULL								,
 	City					NVARCHAR(100)	NOT NULL								,
 	Address					NVARCHAR(100)	NOT NULL								,
-	EmailAddress			NVARCHAR(100)	NOT NULL	UNIQUE						,
+	Email					NVARCHAR(100)	NOT NULL	UNIQUE						,
 	Password				NVARCHAR(100)	NOT NULL								,
 	PhoneNumber				NVARCHAR(20)	NOT NULL	UNIQUE						,
 	PostalCode				NVARCHAR(11)	NOT NULL								,
