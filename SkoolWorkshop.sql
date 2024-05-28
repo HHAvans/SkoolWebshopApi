@@ -8,7 +8,7 @@ CREATE TABLE "User" (
 	City					NVARCHAR(100)	NOT NULL								,
 	Address					NVARCHAR(100)	NOT NULL								,
 	Email					NVARCHAR(100)	NOT NULL	UNIQUE						,
-	Password				NVARCHAR(100)	NOT NULL								,
+	Password				NVARCHAR(300)	NOT NULL								,
 	PhoneNumber				NVARCHAR(20)	NOT NULL	UNIQUE						,
 	PostalCode				NVARCHAR(11)	NOT NULL								,
 	BTWNumber				INTEGER													,
@@ -27,7 +27,7 @@ CREATE TABLE "User" (
 )
 
 INSERT INTO "User" VALUES (
-	'Clinten Pique', '1999-02-02', 'Breda', 'Lovensdijkstraat 61', 'info@skoolworkshop.com', 'password' ,'+316000000', '4614RM', '5641421', '4542522', 'NL06241231231312', 'ZZP', 'Admin', '100', '0', '1', '1'
+	'Clinten Pique', '1999-02-02', 'Breda', 'Lovensdijkstraat 61', 'info@skoolworkshop.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2' ,'+316000000', '4614RM', '5641421', '4542522', 'NL06241231231312', 'ZZP', 'Admin', '100', '0', '1', '1'
 )
 
 DROP TABLE IF EXISTS "Workshop";

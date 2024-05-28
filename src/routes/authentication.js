@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { sql, poolPromise } = require('../dao/sqldao.js');
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 require('dotenv').config();
 
 // Route to get all users
@@ -11,6 +12,9 @@ router.post('/login', async (req, res) => {
     const email = req.body.email
     const password = req.body.password
     let result;
+
+    let salt = bcrypt.hashSync(password, bcrypt.genSaltSync(10))
+    console.log(`POST /auth/login Attempting search of hashed password: ` + bcrypt.hashSync(password, salt))
 
     try {
         const pool = await poolPromise;
@@ -31,7 +35,7 @@ router.post('/login', async (req, res) => {
         })
     }
 
-    if (password != result.recordset[0].Password) {
+    if (bcrypt.compareSync(result.recordset[0].Password, bcrypt.hashSync(password, salt))) {
         //Invalid password
         console.log('POST /auth/login invalid password');
         return res.status(401).json({
