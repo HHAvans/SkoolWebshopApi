@@ -9,7 +9,8 @@ const dbConfig = {
     database: process.env.DB_DATABASE,
     options: {
         encrypt: true, // true if you're on Azure or need encryption
-        enableArithAbort: true
+        enableArithAbort: true,
+        trustServerCertificate: true // Accept self-signed certificate
     },
     pool: {
         max: 10,

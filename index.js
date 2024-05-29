@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const port = 300;
+const port =  process.env.PORT || 300;
 
 
 //Main routes
