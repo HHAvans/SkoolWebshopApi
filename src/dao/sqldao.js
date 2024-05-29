@@ -8,7 +8,7 @@ const dbConfig = {
     port: parseInt(process.env.DB_PORT, 10),
     database: process.env.DB_DATABASE,
     options: {
-        encrypt: false, // true if you're on Azure or need encryption
+        encrypt: true, // true if you're on Azure or need encryption
         enableArithAbort: true
     },
     pool: {
