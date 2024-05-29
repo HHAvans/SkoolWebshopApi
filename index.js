@@ -1,9 +1,9 @@
 const express = require('express');
-const cors = require('cors');
 const { sql, poolPromise } = require('./src/dao/sqldao.js');
+const cors = require('cors');
 const app = express();
 
-// Use cors to allow website to fetch api
+app.use(express.json());
 app.use(cors());
 
 const port = 300;
