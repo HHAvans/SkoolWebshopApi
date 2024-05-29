@@ -2,7 +2,24 @@ const express = require('express');
 const router = express.Router();
 const { sql, poolPromise } = require('../dao/sqldao.js');
 
-// Add client
+/** Add client route
+ * 
+ *  Route to add a client into the database.
+ * 
+ *  EXPECTED JSON BODY
+ 
+{
+    "clientname": "Example Name",
+    "organisation": "Example BV",
+    "targetaudience": "Example people",
+    "email": "example@mail.nl",
+    "phonenumber": "31600000000",
+    "contactperson": "Example person",
+    "address": "Example 1",
+    "kvknumber": "1"
+}
+
+ */
 router.post('/add', async (req, res) => {
     console.log('POST /add');
 

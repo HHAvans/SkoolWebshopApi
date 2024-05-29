@@ -5,7 +5,20 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 require('dotenv').config();
 
-// Route to get all users
+
+/** Login route
+ * 
+ *  This route is used at the start of the website at the login. With an email and password
+ *  it generates an JSON Web Token to acces the rest of the website which is send back to the website.
+ * 
+ *  EXPECTED JSON BODY
+ 
+{
+    "email": "example@mail.com",
+    "password": "123"
+}
+
+ */
 router.post('/login', async (req, res) => {
     console.log('POST /auth/login');
 
@@ -14,15 +27,14 @@ router.post('/login', async (req, res) => {
     let result;
 
     let salt = bcrypt.hashSync(password, bcrypt.genSaltSync(10))
-    console.log(`POST /auth/login Attempting search of hashed password: ` + bcrypt.hashSync(password, salt))
 
     try {
         const pool = await poolPromise;
-        result = await pool.request().query(`SELECT Password FROM [User] WHERE Email = '${email}'`);
         console.log(`EXECUTING QUERY ON DATABASE: SELECT Password FROM [User] WHERE Email = '${email}'`)
+        result = await pool.request().query(`SELECT Password FROM [User] WHERE Email = '${email}'`);
     } catch (error) {
         console.error('Database query error:', error);
-        res.status(500).json({ error: 'Database Query Error' });
+        return res.status(500).json({ error: 'Database Query Error' });
     }
 
     //If no passwords are found with that email

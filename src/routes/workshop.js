@@ -2,7 +2,20 @@ const express = require('express');
 const router = express.Router();
 const { sql, poolPromise } = require('../dao/sqldao.js');
 
-// Add workshop
+/** Add workshop route
+ * 
+ *  Adds a workshop row to the database
+ * 
+ *  EXPECTED JSON BODY
+ 
+{
+    "name": "Graffiti",
+    "category": "Outdoor",
+    "requirements": "",
+    "description": "Workshop graffiti"
+}
+
+ */
 router.post('/add', async (req, res) => {
     console.log('POST /add');
 

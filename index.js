@@ -1,36 +1,25 @@
 const express = require('express');
-const { sql, poolPromise } = require('./src/dao/sqldao.js');
 const cors = require('cors');
+const { sql, poolPromise } = require('./src/dao/sqldao.js');
 const app = express();
 
-app.use(express.json());
+// Use cors to allow website to fetch api
 app.use(cors());
 
 const port = 300;
 
 
-//Other routes
+//Main routes
 const userRoutes = require('./src/routes/user.js')
 const workshopRoutes = require('./src/routes/workshop.js')
 const authenticationRoutes = require('./src/routes/authentication.js')
-const customerRoutes = require('./src/routes/customer.js')
+const customerRoutes = require('./src/routes/client.js')
 
 app.use('/user', userRoutes)
 app.use('/workshop', workshopRoutes)
 app.use('/auth', authenticationRoutes)
 app.use('/client', customerRoutes)
 
-
-// Simple route for testing
-app.get('/info', (req, res) => {
-    console.log('GET /api/info');
-    const info = {
-        name: 'Express nodejs server programmeren 4',
-        version: '1.0.0',
-        description: 'Dit is de nodejs express server voor mijn programmeren 4 toets.'
-    };
-    res.json(info);
-});
 
 // Route error handler
 app.use((req, res, next) => {
@@ -50,6 +39,7 @@ app.use((error, req, res, next) => {
     });
 });
 
+// Host 0.0.0.0 to allow remote connections
 app.listen(port, '0.0.0.0', () => {
     console.log(`Server is running on port ${port}`);
 });
