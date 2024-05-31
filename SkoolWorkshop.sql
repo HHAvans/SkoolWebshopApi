@@ -134,7 +134,8 @@ INSERT INTO Workshop (Name, Category, Requirements, Description)
 VALUES
 ('Fotografie', 'Kunst', 'Camera, Geheugenkaart', 'Leer de basisprincipes van fotografie en verbeter je vaardigheden.'),
 ('Openbaar Spreken', 'Communicatie', 'Geen', 'Overwin je angst voor spreken in het openbaar met onze deskundige begeleiding.'),
-('Python Programmeren', 'Technologie', 'Laptop', 'Introductie tot Python programmeren voor beginners.');
+('Python Programmeren', 'Technologie', 'Laptop', 'Introductie tot Python programmeren voor beginners.'),
+('Java Programmeren', 'Technologie', 'Laptop', 'Introductie tot Java programmeren voor beginners.');
 
 
 INSERT INTO Client (ClientName, Organisation, TargetAudience, ContactPerson, Email, PhoneNumber, Address, KvkNumber)
@@ -145,19 +146,20 @@ VALUES
 
 INSERT INTO "Commission" (ClientId, Name, Address, Date, Notes)
 VALUES
-((SELECT ClientId FROM Client WHERE ClientName = 'Technische Universiteit'), 'Python Bootcamp', 'Technische Universiteit Campus', '2024-07-15', 'Een uitgebreide bootcamp over Python programmeren.'),
+((SELECT ClientId FROM Client WHERE ClientName = 'Technische Universiteit'), 'Programmeren Bootcamp', 'Technische Universiteit Campus', '2024-07-15', 'Een uitgebreide bootcamp over programmeren.'),
 ((SELECT ClientId FROM Client WHERE ClientName = 'Wereldwijde Corp'), 'Teambuilding Workshop', 'Wereldwijde Corp Hoofdkantoor', '2024-08-20', 'Een workshop gericht op het verbeteren van de teamcohesie en samenwerking.');
 
 
 INSERT INTO "CommissionWorkshop" (CommissionId, WorkshopId, StartTime, EndTime, NumberOfParticipants, Address, Level, [Group], Notes)
 VALUES
-((SELECT CommissionId FROM "Commission" WHERE Name = 'Python Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Python Programmeren'), '09:00', '17:00', 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische sessies.'),
+((SELECT CommissionId FROM "Commission" WHERE Name = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Python Programmeren'), '09:00', '17:00', 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische python sessies.'),
+((SELECT CommissionId FROM "Commission" WHERE Name = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Java Programmeren'), '09:00', '17:00', 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische java sessies.'),
 ((SELECT CommissionId FROM "Commission" WHERE Name = 'Teambuilding Workshop'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Openbaar Spreken'), '13:00', '15:00', 25, 'Wereldwijde Corp Hoofdkantoor', 'Beginner', 'C', 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.');
 
 
 INSERT INTO "CommissionWorkshopUser" (CommissionWorkshopId, UserId, Status)
 VALUES
-((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE Notes = 'Dagdagen bootcamp met praktische sessies.'), (SELECT UserId FROM "User" WHERE Username = 'Janine Doe'), 'Toegewezen'),
+((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE Notes = 'Dagdagen bootcamp met java sessies.'), (SELECT UserId FROM "User" WHERE Username = 'Janine Doe'), 'Toegewezen'),
 ((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE Notes = 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.'), (SELECT UserId FROM "User" WHERE Username = 'John de Vries'), 'Toegewezen');
 
 
@@ -165,3 +167,7 @@ INSERT INTO "EmailTemplate" (Name, Content)
 VALUES
 ('Bedankt', 'Beste [Naam], bedankt voor uw deelname aan onze workshop. We hopen dat u een geweldige ervaring had.'),
 ('Opvolging', 'Beste [Naam], we horen graag uw feedback over de recente workshop die u heeft bijgewoond.');
+
+SELECT * FROM CommissionWorkshop
+INNER JOIN Commission ON CommissionWorkshop.CommissionId = Commission.CommissionId
+INNER JOIN Workshop ON CommissionWorkshop.WorkshopId = Workshop.WorkshopId
