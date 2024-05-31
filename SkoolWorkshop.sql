@@ -42,10 +42,11 @@ CREATE TABLE "User" (
 
 CREATE TABLE Workshop (
 	WorkshopId				INTEGER			PRIMARY KEY				IDENTITY(1,1)	,
-	Name					NVARCHAR(64)	NOT NULL								,
+	Name					NVARCHAR(64)	NOT NULL				UNIQUE			,
 	Category				NVARCHAR(64)	NOT NULL								,
 	Requirements			NVARCHAR(4000)	NOT NULL								,
 	Description				NVARCHAR(4000)	NOT NULL								,
+	PictureLink				NVARCHAR(200)	NOT NULL								,
 )
 
 CREATE TABLE Client (
@@ -130,12 +131,12 @@ VALUES
 ('Clinten Pique', '1999-02-02', 'Breda', 'Lovensdijkstraat 61', 'info@skoolworkshop.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2' ,'+316000000', '4614RM', '5641421', '4542522', 'NL06241231231312', 'ZZP', 'Admin', 100, 0, 1, 1);
 
 
-INSERT INTO Workshop (Name, Category, Requirements, Description)
+INSERT INTO Workshop (Name, Category, Requirements, Description, PictureLink)
 VALUES
-('Fotografie', 'Kunst', 'Camera, Geheugenkaart', 'Leer de basisprincipes van fotografie en verbeter je vaardigheden.'),
-('Openbaar Spreken', 'Communicatie', 'Geen', 'Overwin je angst voor spreken in het openbaar met onze deskundige begeleiding.'),
-('Python Programmeren', 'Technologie', 'Laptop', 'Introductie tot Python programmeren voor beginners.'),
-('Java Programmeren', 'Technologie', 'Laptop', 'Introductie tot Java programmeren voor beginners.');
+('Vloggen', 'Kunst', 'Camera, Geheugenkaart', 'Leer de basisprincipes van vloggen en verbeter je vaardigheden.', 'https://skoolworkshop.nl/wp-content/uploads/2019/12/Vlog-Workshop-op-school-1024x652.jpg'),
+('Openbaar Spreken', 'Communicatie', 'Geen', 'Overwin je angst voor spreken in het openbaar met onze deskundige begeleiding.', 'https://skoolworkshop.nl/wp-content/uploads/2020/09/Jongens-rap-e1643291580110-1024x653.jpg'),
+('Python Programmeren', 'Technologie', 'Laptop', 'Introductie tot Python programmeren voor beginners.', 'https://skoolworkshop.nl/wp-content/uploads/2023/09/Workshop-Podcast-Maken.jpg'),
+('Java Programmeren', 'Technologie', 'Laptop', 'Introductie tot Java programmeren voor beginners.', 'https://skoolworkshop.nl/wp-content/uploads/2023/09/Workshop-Podcast-Maken.jpg');
 
 
 INSERT INTO Client (ClientName, Organisation, TargetAudience, ContactPerson, Email, PhoneNumber, Address, KvkNumber)
@@ -159,7 +160,7 @@ VALUES
 
 INSERT INTO "CommissionWorkshopUser" (CommissionWorkshopId, UserId, Status)
 VALUES
-((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE Notes = 'Dagdagen bootcamp met java sessies.'), (SELECT UserId FROM "User" WHERE Username = 'Janine Doe'), 'Toegewezen'),
+((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE Notes = 'Dagdagen bootcamp met praktische java sessies.'), (SELECT UserId FROM "User" WHERE Username = 'Janine Doe'), 'Toegewezen'),
 ((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE Notes = 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.'), (SELECT UserId FROM "User" WHERE Username = 'John de Vries'), 'Toegewezen');
 
 
