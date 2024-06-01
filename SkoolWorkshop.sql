@@ -16,24 +16,24 @@ DROP TABLE IF EXISTS "User";
 ░░░╚═╝░░░╚═╝░░╚═╝╚═════╝░╚══════╝╚══════╝╚═════╝░
 */
 CREATE TABLE "User" (
-	UserId					INTEGER			PRIMARY KEY	IDENTITY(1,1)				,
-	Username				NVARCHAR(64)	NOT NULL								,
-	Birthdate				DATE			NOT NULL								,
-	City					NVARCHAR(100)	NOT NULL								,
-	Address					NVARCHAR(100)	NOT NULL								,
-	Email					NVARCHAR(100)	NOT NULL	UNIQUE						,
-	Password				NVARCHAR(300)	NOT NULL								,
-	PhoneNumber				NVARCHAR(20)	NOT NULL	UNIQUE						,
-	PostalCode				NVARCHAR(11)	NOT NULL								,
-	BTWNumber				INTEGER													,
-	KVKNumber				INTEGER													,
-	BankId					NVARCHAR(34)	NOT NULL								,
-	Role					NVARCHAR(20)	NOT NULL								,
-	Permission				NVARCHAR(20)	NOT NULL	DEFAULT 'Default'			,
-	SalaryPerHourInEuro		DECIMAL(5,2)	NOT NULL								,
-	UsesPublicTransit		BIT				NOT NULL								,
-	HasCar					BIT				NOT NULL								,
-	HasLicense				BIT				NOT NULL								,
+	UserId					INTEGER			PRIMARY KEY	IDENTITY(1,1),
+	Username				NVARCHAR(64)	NOT NULL,
+	Birthdate				DATE			NOT NULL,
+	City					NVARCHAR(100)	NOT NULL,
+	Address					NVARCHAR(100)	NOT NULL,
+	Email					NVARCHAR(100)	NOT NULL	UNIQUE,
+	Password				NVARCHAR(300)	NOT NULL,
+	PhoneNumber				NVARCHAR(20)	NOT NULL	UNIQUE,
+	PostalCode				NVARCHAR(11)	NOT NULL,
+	BTWNumber				INTEGER	,
+	KVKNumber				INTEGER	,
+	BankId					NVARCHAR(34)	NOT NULL,
+	Role					NVARCHAR(20)	NOT NULL,
+	Permission				NVARCHAR(20)	NOT NULL	DEFAULT 'Default',
+	SalaryPerHourInEuro		DECIMAL(5,2)	NOT NULL,
+	UsesPublicTransit		BIT				NOT NULL,
+	HasCar					BIT				NOT NULL,
+	HasLicense				BIT				NOT NULL,
 	
 	CONSTRAINT CHK_Role CHECK (Role = 'ZZP' OR Role = 'Flex'),
 	CONSTRAINT CHK_Permission CHECK (Permission = 'Default' OR Permission = 'Moderator' OR Permission = 'Admin'),
@@ -41,23 +41,23 @@ CREATE TABLE "User" (
 )
 
 CREATE TABLE Workshop (
-	WorkshopId				INTEGER			PRIMARY KEY				IDENTITY(1,1)	,
-	Name					NVARCHAR(64)	NOT NULL				UNIQUE			,
-	Category				NVARCHAR(64)	NOT NULL								,
-	Requirements			NVARCHAR(4000)	NOT NULL								,
-	Description				NVARCHAR(4000)	NOT NULL								,
-	PictureLink				NVARCHAR(200)	NOT NULL								,
-)
+	WorkshopId				INTEGER			PRIMARY KEY	IDENTITY(1,1),
+	Name					NVARCHAR(64)	NOT NULL	UNIQUE,
+	Category				NVARCHAR(64)	NOT NULL,
+	Requirements			NVARCHAR(4000)	NOT NULL,
+	Description				NVARCHAR(4000)	NOT NULL,
+	LinkToPicture			NVARCHAR(200)	NOT NULL
+);
 
 CREATE TABLE Client (
-	ClientId				INTEGER			PRIMARY KEY				IDENTITY(1,1)	,
-	ClientName				NVARCHAR(100)	NOT NULL	,
-	Organisation			NVARCHAR(100)	NOT NULL	,
-	TargetAudience			NVARCHAR(100)	NOT NULL	,
-	ContactPerson			NVARCHAR(100)	NOT NULL	,
-	Email					NVARCHAR(100)	NOT NULL	,
-	PhoneNumber				NVARCHAR(100)	NULL		,
-	Address					NVARCHAR(100)	NOT NULL	,
+	ClientId				INTEGER			PRIMARY KEY	IDENTITY(1,1),
+	ClientName				NVARCHAR(100)	NOT NULL,
+	Organisation			NVARCHAR(100)	NOT NULL,
+	TargetAudience			NVARCHAR(100)	NOT NULL,
+	ContactPerson			NVARCHAR(100)	NOT NULL,
+	Email					NVARCHAR(100)	NOT NULL,
+	PhoneNumber				NVARCHAR(100)	NULL,
+	Address					NVARCHAR(100)	NOT NULL,
 	KvkNumber				INT				NULL
 );
 
@@ -100,6 +100,8 @@ CREATE TABLE "CommissionWorkshopUser" (
 	UserId INTEGER NOT NULL,
 	Status NVARCHAR(10) NOT NULL
 
+	CONSTRAINT CK_Status CHECK (Status = 'Toegewezen' OR Status = 'Afwachtend' OR Status = 'Afgekeurd')
+
 	CONSTRAINT FK_CommissionWorkshopUser_CommissionWorkshop FOREIGN KEY (CommissionWorkshopId) REFERENCES CommissionWorkshop (CommissionWorkshopId)
 	ON DELETE NO ACTION
 	ON UPDATE CASCADE,
@@ -122,7 +124,7 @@ CREATE TABLE "EmailTemplate" (
 ░╚████╔╝░██╔══██║██║░░░░░██║░░░██║██╔══╝░░░╚═══██╗
 ░░╚██╔╝░░██║░░██║███████╗╚██████╔╝███████╗██████╔╝
 ░░░╚═╝░░░╚═╝░░╚═╝╚══════╝░╚═════╝░╚══════╝╚═════╝░
-*/
+*/ GO
 
 INSERT INTO "User" (Username, Birthdate, City, Address, Email, Password, PhoneNumber, PostalCode, BTWNumber, KVKNumber, BankId, Role, Permission, SalaryPerHourInEuro, UsesPublicTransit, HasCar, HasLicense)
 VALUES
@@ -131,7 +133,7 @@ VALUES
 ('Clinten Pique', '1999-02-02', 'Breda', 'Lovensdijkstraat 61', 'info@skoolworkshop.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2' ,'+316000000', '4614RM', '5641421', '4542522', 'NL06241231231312', 'ZZP', 'Admin', 100, 0, 1, 1);
 
 
-INSERT INTO Workshop (Name, Category, Requirements, Description, PictureLink)
+INSERT INTO Workshop (Name, Category, Requirements, Description, LinkToPicture)
 VALUES
 ('Vloggen', 'Kunst', 'Camera, Geheugenkaart', 'Leer de basisprincipes van vloggen en verbeter je vaardigheden.', 'https://skoolworkshop.nl/wp-content/uploads/2019/12/Vlog-Workshop-op-school-1024x652.jpg'),
 ('Openbaar Spreken', 'Communicatie', 'Geen', 'Overwin je angst voor spreken in het openbaar met onze deskundige begeleiding.', 'https://skoolworkshop.nl/wp-content/uploads/2020/09/Jongens-rap-e1643291580110-1024x653.jpg'),
@@ -161,7 +163,8 @@ VALUES
 INSERT INTO "CommissionWorkshopUser" (CommissionWorkshopId, UserId, Status)
 VALUES
 ((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE Notes = 'Dagdagen bootcamp met praktische java sessies.'), (SELECT UserId FROM "User" WHERE Username = 'Janine Doe'), 'Toegewezen'),
-((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE Notes = 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.'), (SELECT UserId FROM "User" WHERE Username = 'John de Vries'), 'Toegewezen');
+((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE Notes = 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.'), (SELECT UserId FROM "User" WHERE Username = 'John de Vries'), 'Toegewezen'),
+((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE Notes = 'Dagdagen bootcamp met praktische python sessies.'), (SELECT UserId FROM "User" WHERE Username = 'John de Vries'), 'Afwachtend');
 
 
 INSERT INTO "EmailTemplate" (Name, Content)
@@ -169,6 +172,18 @@ VALUES
 ('Bedankt', 'Beste [Naam], bedankt voor uw deelname aan onze workshop. We hopen dat u een geweldige ervaring had.'),
 ('Opvolging', 'Beste [Naam], we horen graag uw feedback over de recente workshop die u heeft bijgewoond.');
 
-SELECT * FROM CommissionWorkshop
-INNER JOIN Commission ON CommissionWorkshop.CommissionId = Commission.CommissionId
-INNER JOIN Workshop ON CommissionWorkshop.WorkshopId = Workshop.WorkshopId
+
+/*
+░██████╗░██╗░░░██╗███████╗██████╗░██╗███████╗░██████╗
+██╔═══██╗██║░░░██║██╔════╝██╔══██╗██║██╔════╝██╔════╝
+██║██╗██║██║░░░██║█████╗░░██████╔╝██║█████╗░░╚█████╗░
+╚██████╔╝██║░░░██║██╔══╝░░██╔══██╗██║██╔══╝░░░╚═══██╗
+░╚═██╔═╝░╚██████╔╝███████╗██║░░██║██║███████╗██████╔╝
+░░░╚═╝░░░░╚═════╝░╚══════╝╚═╝░░╚═╝╚═╝╚══════╝╚═════╝░
+*/
+
+-- Get workshops in commissions with no user assigned to it
+SELECT *
+FROM CommissionWorkshop t1
+INNER JOIN Workshop ON t1.WorkshopId = Workshop.WorkshopId
+WHERE NOT EXISTS (SELECT t2.CommissionWorkshopId, t2.Status FROM CommissionWorkshopUser t2 WHERE t1.CommissionWorkshopId = t2.CommissionWorkshopId AND t2.Status = 'Toegewezen')

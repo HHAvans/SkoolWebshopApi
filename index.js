@@ -13,13 +13,13 @@ const userRoutes = require("./src/routes/user.js");
 const workshopRoutes = require("./src/routes/workshop.js");
 const authenticationRoutes = require("./src/routes/authentication.js");
 const customerRoutes = require("./src/routes/client.js");
-const workshopReadRoutes = require("./src/routes/workshopRead.js");
+const commissionRoutes = require("./src/routes/commission.js");
 
 app.use("/user", userRoutes);
 app.use("/workshop", workshopRoutes);
 app.use("/auth", authenticationRoutes);
 app.use("/client", customerRoutes);
-app.use("/workshops", workshopReadRoutes);
+app.use("/commission", commissionRoutes);
 
 // Route error handler
 app.use((req, res, next) => {
