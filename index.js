@@ -2,6 +2,8 @@ const express = require('express');
 const { sql, poolPromise } = require('./src/dao/sqldao.js');
 const cors = require('cors');
 const app = express();
+const path = require('path');
+
 
 app.use(express.json());
 app.use(cors());
@@ -20,6 +22,9 @@ app.use('/workshop', workshopRoutes)
 app.use('/auth', authenticationRoutes)
 app.use('/client', customerRoutes)
 
+//Email routes
+const emailRouter = require('./routes/email');
+app.use('/email', emailRouter);
 
 // Route error handler
 app.use((req, res, next) => {
