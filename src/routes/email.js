@@ -8,7 +8,7 @@ const { sql, poolPromise } = require('../dao/sqldao');
 router.get('/templates', async (req, res) => {
     console.log('GET /templates');
 
-    const templateName = req.query.template; // Get template name from query parameters
+    const templateName = req.body.templateName; // Get template name from query parameters
 
     if (!templateName) {
         res.status(400).json({ error: 'Template name is required' });
@@ -25,7 +25,11 @@ router.get('/templates', async (req, res) => {
 
         if (result.recordset.length > 0) {
             const templateContent = result.recordset[0].CONTENT;
-            res.send(templateContent);
+            res.status(200).json({
+                status: 200,
+                message: "Template found",
+                data: templateContent
+        });
         } else {
             res.status(404).json({ error: 'Template not found' });
         }

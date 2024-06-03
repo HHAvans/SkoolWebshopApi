@@ -23,7 +23,7 @@ app.use("/workshop", workshopRoutes);
 app.use("/auth", authenticationRoutes);
 app.use("/client", customerRoutes);
 app.use("/commission", commissionRoutes);
-app.use("/templates", emailRoutes);
+app.use("/email", emailRoutes);
 
 // Route error handler
 app.use((req, res, next) => {
