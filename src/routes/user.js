@@ -34,7 +34,11 @@ router.get('/all', async (req, res) => {
             return rest;
         });
 
-        res.json(usersWithoutIdAndPassword);
+        res.json({
+            status: 200,
+            message: "User retrieved",
+            data: usersWithoutIdAndPassword
+        });
     } catch (error) {
         console.error('Database query error:', error);
         res.status(500).json({ error: 'Database Query Error' });
