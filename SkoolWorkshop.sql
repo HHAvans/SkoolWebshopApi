@@ -42,7 +42,7 @@ CREATE TABLE "User" (
 
 CREATE TABLE Workshop (
 	WorkshopId				INTEGER			PRIMARY KEY	IDENTITY(1,1),
-	Name					NVARCHAR(64)	NOT NULL	UNIQUE,
+	WorkshopName					NVARCHAR(64)	NOT NULL	UNIQUE,
 	Category				NVARCHAR(64)	NOT NULL,
 	Requirements			NVARCHAR(4000)	NOT NULL,
 	Description				NVARCHAR(4000)	NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE Client (
 CREATE TABLE "Commission" (
 	CommissionId INTEGER PRIMARY KEY IDENTITY(1,1),
 	ClientId INTEGER NOT NULL,
-	Name NVARCHAR(100) NOT NULL,
+	CommissionName NVARCHAR(100) NOT NULL,
 	Address NVARCHAR(100) NOT NULL,
 	Date DATE NOT NULL,
 	CommissionNotes NVARCHAR(1000) NOT NULL,
@@ -134,7 +134,7 @@ VALUES
 ('Clinten Pique', '1999-02-02', 'Breda', 'Lovensdijkstraat 61', 'info@skoolworkshop.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2' ,'+316000000', '4614RM', '5641421', '4542522', 'NL06241231231312', 'ZZP', 'Admin', 100, 0, 1, 1);
 
 
-INSERT INTO Workshop (Name, Category, Requirements, Description, LinkToPicture)
+INSERT INTO Workshop (WorkshopName, Category, Requirements, Description, LinkToPicture)
 VALUES
 ('Vloggen', 'Kunst', 'Camera, Geheugenkaart', 'Leer de basisprincipes van vloggen en verbeter je vaardigheden.', 'https://skoolworkshop.nl/wp-content/uploads/2019/12/Vlog-Workshop-op-school-1024x652.jpg'),
 ('Openbaar Spreken', 'Communicatie', 'Geen', 'Overwin je angst voor spreken in het openbaar met onze deskundige begeleiding.', 'https://skoolworkshop.nl/wp-content/uploads/2020/09/Jongens-rap-e1643291580110-1024x653.jpg'),
@@ -148,7 +148,7 @@ VALUES
 ('Wereldwijde Corp', 'Wereldwijde Corporatie', 'Werknemers', 'Michael Bruin', 'michael.bruin@wereldwijdecorp.com', '+31655556666', 'Zakelijk Plaza 78', 987654);
 
 
-INSERT INTO "Commission" (ClientId, Name, Address, Date, CommissionNotes)
+INSERT INTO "Commission" (ClientId, CommissionName, Address, Date, CommissionNotes)
 VALUES
 ((SELECT ClientId FROM Client WHERE ClientName = 'Technische Universiteit'), 'Programmeren Bootcamp', 'Technische Universiteit Campus', '2024-07-15', 'Een uitgebreide bootcamp over programmeren.'),
 ((SELECT ClientId FROM Client WHERE ClientName = 'Wereldwijde Corp'), 'Teambuilding Workshop', 'Wereldwijde Corp Hoofdkantoor', '2024-08-20', 'Een workshop gericht op het verbeteren van de teamcohesie en samenwerking.');
@@ -156,9 +156,9 @@ VALUES
 
 INSERT INTO "CommissionWorkshop" (CommissionId, WorkshopId, StartTime, EndTime, MaxUsers, NumberOfParticipants, Location, Level, TargetGroup, WorkshopNotes)
 VALUES
-((SELECT CommissionId FROM "Commission" WHERE Name = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Python Programmeren'), '09:00', '17:00', 1, 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische python sessies.'),
-((SELECT CommissionId FROM "Commission" WHERE Name = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Java Programmeren'), '09:00', '17:00', 1, 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische java sessies.'),
-((SELECT CommissionId FROM "Commission" WHERE Name = 'Teambuilding Workshop'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Openbaar Spreken'), '13:00', '15:00', 2, 25, 'Wereldwijde Corp Hoofdkantoor', 'Beginner', 'C', 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.');
+((SELECT CommissionId FROM "Commission" WHERE CommissionName = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE WorkshopName = 'Python Programmeren'), '09:00', '17:00', 1, 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische python sessies.'),
+((SELECT CommissionId FROM "Commission" WHERE CommissionName = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE WorkshopName = 'Java Programmeren'), '09:00', '17:00', 1, 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische java sessies.'),
+((SELECT CommissionId FROM "Commission" WHERE CommissionName = 'Teambuilding Workshop'), (SELECT WorkshopId FROM Workshop WHERE WorkshopName = 'Openbaar Spreken'), '13:00', '15:00', 2, 25, 'Wereldwijde Corp Hoofdkantoor', 'Beginner', 'C', 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.');
 
 
 INSERT INTO "CommissionWorkshopUser" (CommissionWorkshopId, UserId, Status)
@@ -256,13 +256,13 @@ GO
 */
 
 -- Get workshops in commissions with no user assigned to it
-SELECT CommissionWorkshopId, CommissionId, StartTime, EndTime, NumberOfParticipants, Location, Level, TargetGroup, WorkshopNotes, Workshop.WorkshopId, Workshop.Name, Workshop.Category, Workshop.Requirements, Workshop.Description, Workshop.LinkToPicture
+SELECT CommissionWorkshopId, CommissionId, StartTime, EndTime, NumberOfParticipants, Location, Level, TargetGroup, WorkshopNotes, Workshop.WorkshopId, WorkshopName, Workshop.Category, Workshop.Requirements, Workshop.Description, Workshop.LinkToPicture
 FROM CommissionWorkshop t1
 INNER JOIN Workshop ON t1.WorkshopId = Workshop.WorkshopId
 WHERE NOT EXISTS (SELECT t2.CommissionWorkshopId, t2.Status FROM CommissionWorkshopUser t2 WHERE t1.CommissionWorkshopId = t2.CommissionWorkshopId AND t2.Status = 'Toegewezen')
 
 --Get workshops in commissions and all associated data for front page ordered by data and time
-SELECT CommissionWorkshopId, Workshop.Name, Date, StartTime, EndTime, Requirements, Category, Commission.Name, Location, LinkToPicture FROM CommissionWorkshop
+SELECT CommissionWorkshopId, WorkshopName, Date, StartTime, EndTime, Requirements, Category, CommissionName, Location, LinkToPicture FROM CommissionWorkshop
 INNER JOIN Commission ON CommissionWorkshop.CommissionId = Commission.CommissionId
 INNER JOIN Workshop ON CommissionWorkshop.WorkshopId = Workshop.WorkshopId
 ORDER BY Date, StartTime
