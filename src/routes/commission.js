@@ -57,15 +57,15 @@ router.get("/:id", async (req, res) => {
   try {
     const pool = await poolPromise;
     const query = `
-      SELECT 
-        CL.ClientName, 
-        C.Name AS CommissionName, C.Address AS CommissionAddress, C.Notes AS CommissionNotes,
-        W.Name AS WorkshopName, W.Description AS WorkshopDescription, W.Category AS WorkshopCategory, 
-        W.LinkToPicture AS WorkshopLinkToPicture, W.Requirements AS WorkshopRequirements,
-        CW.StartTime, CW.EndTime, CW.Address AS WorkshopAddress, CW.TargetGroup, CW.Level, CW.Notes AS WorkshopNotes, 
-        CW.NumberOfParticipants, CW.WorkshopId, CW.CommissionWorkshopId,
-        CWU.UserId,
-        U.Username, U.Email
+    SELECT 
+    CL.ClientName, 
+    C.CommissionName AS CommissionName, C.Address AS CommissionAddress, C.CommissionNotes AS CommissionNotes,
+    W.WorkshopName AS WorkshopName, W.Description AS WorkshopDescription, W.Category AS WorkshopCategory, 
+    W.LinkToPicture AS WorkshopLinkToPicture, W.Requirements AS WorkshopRequirements,
+    CW.StartTime, CW.EndTime, CW.Location AS WorkshopAddress, CW.TargetGroup, CW.Level, CW.WorkshopNotes AS WorkshopNotes, 
+    CW.NumberOfParticipants, CW.WorkshopId, CW.CommissionWorkshopId,
+    CWU.UserId,
+    U.Username, U.Email
       FROM CommissionWorkshop CW
       JOIN Commission C ON C.CommissionId = CW.CommissionId
       LEFT JOIN CommissionWorkshopUser CWU ON CWU.CommissionWorkshopId = CW.CommissionWorkshopId
@@ -74,6 +74,7 @@ router.get("/:id", async (req, res) => {
       JOIN Client CL ON CL.ClientId = C.ClientId
       WHERE CW.CommissionId = ${req.params.id};
     `;
+    
 
     console.log("EXECUTING QUERY ON DATABASE: " + query);
     const result = await pool.request().query(query);
