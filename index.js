@@ -18,6 +18,7 @@ const customerRoutes = require("./src/routes/client.js");
 const commissionRoutes = require("./src/routes/commission.js");
 const emailRoutes = require("./src/routes/email.js");
 const workshopCommissionRoutes = require("./src/routes/workshopcommission.js");
+const optionsRoutes = require("./src/routes/options.js");
 
 app.use("/user", userRoutes);
 app.use("/workshop", workshopRoutes);
@@ -27,6 +28,12 @@ app.use("/commission", commissionRoutes);
 app.use("/commission/:id", commissionRoutes);
 app.use("/email", emailRoutes);
 app.use("/workshopcommission", workshopCommissionRoutes);
+app.use("/options", optionsRoutes);
+
+// serve the html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'addCommission.html'));
+});
 
 // Route error handler
 app.use((req, res, next) => {
