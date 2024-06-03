@@ -2,6 +2,8 @@ const express = require("express");
 const { sql, poolPromise } = require("./src/dao/sqldao.js");
 const cors = require("cors");
 const app = express();
+const path = require('path');
+
 
 app.use(express.json());
 app.use(cors());
@@ -14,6 +16,8 @@ const workshopRoutes = require("./src/routes/workshop.js");
 const authenticationRoutes = require("./src/routes/authentication.js");
 const customerRoutes = require("./src/routes/client.js");
 const commissionRoutes = require("./src/routes/commission.js");
+const emailRoutes = require("./src/routes/email.js");
+const workshopCommissionRoutes = require("./src/routes/workshopcommission.js");
 
 app.use("/user", userRoutes);
 app.use("/workshop", workshopRoutes);
@@ -21,6 +25,8 @@ app.use("/auth", authenticationRoutes);
 app.use("/client", customerRoutes);
 app.use("/commission", commissionRoutes);
 app.use("/commission/:id", commissionRoutes);
+app.use("/email", emailRoutes);
+app.use("/workshopcommission", workshopCommissionRoutes);
 
 // Route error handler
 app.use((req, res, next) => {

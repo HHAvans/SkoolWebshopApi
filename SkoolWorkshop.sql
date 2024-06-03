@@ -51,7 +51,7 @@ CREATE TABLE Workshop (
 
 CREATE TABLE Client (
 	ClientId				INTEGER			PRIMARY KEY	IDENTITY(1,1),
-	ClientName				NVARCHAR(100)	NOT NULL,
+	ClientName				NVARCHAR(100)	NOT NULL	UNIQUE,
 	Organisation			NVARCHAR(100)	NOT NULL,
 	TargetAudience			NVARCHAR(100)	NOT NULL,
 	ContactPerson			NVARCHAR(100)	NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE "Commission" (
 	Name NVARCHAR(100) NOT NULL,
 	Address NVARCHAR(100) NOT NULL,
 	Date DATE NOT NULL,
-	Notes NVARCHAR(1000) NOT NULL,
+	CommissionNotes NVARCHAR(1000) NOT NULL,
 
 	CONSTRAINT FK_Commission_Client FOREIGN KEY (ClientId) REFERENCES Client (ClientId)
 	ON DELETE NO ACTION
@@ -80,11 +80,12 @@ CREATE TABLE "CommissionWorkshop" (
 	WorkshopId INTEGER NOT NULL,
 	StartTime TIME NOT NULL,
 	EndTime TIME NOT NULL,
+	MaxUsers INT NOT NULL,
 	NumberOfParticipants INTEGER NOT NULL,
-	Address NVARCHAR(100) NOT NULL,
+	Location NVARCHAR(100) NOT NULL,
 	Level NVARCHAR(10) NOT NULL,
 	TargetGroup NVARCHAR(10) NOT NULL,
-	Notes NVARCHAR(1000) NOT NULL
+	WorkshopNotes NVARCHAR(1000) NOT NULL
 
 	CONSTRAINT FK_CommissionWorkshop_Commission FOREIGN KEY (CommissionId) REFERENCES Commission (CommissionId)
 	ON DELETE NO ACTION
@@ -147,24 +148,24 @@ VALUES
 ('Wereldwijde Corp', 'Wereldwijde Corporatie', 'Werknemers', 'Michael Bruin', 'michael.bruin@wereldwijdecorp.com', '+31655556666', 'Zakelijk Plaza 78', 987654);
 
 
-INSERT INTO "Commission" (ClientId, Name, Address, Date, Notes)
+INSERT INTO "Commission" (ClientId, Name, Address, Date, CommissionNotes)
 VALUES
 ((SELECT ClientId FROM Client WHERE ClientName = 'Technische Universiteit'), 'Programmeren Bootcamp', 'Technische Universiteit Campus', '2024-07-15', 'Een uitgebreide bootcamp over programmeren.'),
 ((SELECT ClientId FROM Client WHERE ClientName = 'Wereldwijde Corp'), 'Teambuilding Workshop', 'Wereldwijde Corp Hoofdkantoor', '2024-08-20', 'Een workshop gericht op het verbeteren van de teamcohesie en samenwerking.');
 
 
-INSERT INTO "CommissionWorkshop" (CommissionId, WorkshopId, StartTime, EndTime, NumberOfParticipants, Address, Level, TargetGroup, Notes)
+INSERT INTO "CommissionWorkshop" (CommissionId, WorkshopId, StartTime, EndTime, MaxUsers, NumberOfParticipants, Location, Level, TargetGroup, WorkshopNotes)
 VALUES
-((SELECT CommissionId FROM "Commission" WHERE Name = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Python Programmeren'), '09:00', '17:00', 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische python sessies.'),
-((SELECT CommissionId FROM "Commission" WHERE Name = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Java Programmeren'), '09:00', '17:00', 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische java sessies.'),
-((SELECT CommissionId FROM "Commission" WHERE Name = 'Teambuilding Workshop'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Openbaar Spreken'), '13:00', '15:00', 25, 'Wereldwijde Corp Hoofdkantoor', 'Beginner', 'C', 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.');
+((SELECT CommissionId FROM "Commission" WHERE Name = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Python Programmeren'), '09:00', '17:00', 1, 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische python sessies.'),
+((SELECT CommissionId FROM "Commission" WHERE Name = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Java Programmeren'), '09:00', '17:00', 1, 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische java sessies.'),
+((SELECT CommissionId FROM "Commission" WHERE Name = 'Teambuilding Workshop'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Openbaar Spreken'), '13:00', '15:00', 2, 25, 'Wereldwijde Corp Hoofdkantoor', 'Beginner', 'C', 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.');
 
 
 INSERT INTO "CommissionWorkshopUser" (CommissionWorkshopId, UserId, Status)
 VALUES
-((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE Notes = 'Dagdagen bootcamp met praktische java sessies.'), (SELECT UserId FROM "User" WHERE Username = 'Janine Doe'), 'Toegewezen'),
-((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE Notes = 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.'), (SELECT UserId FROM "User" WHERE Username = 'John de Vries'), 'Toegewezen'),
-((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE Notes = 'Dagdagen bootcamp met praktische python sessies.'), (SELECT UserId FROM "User" WHERE Username = 'John de Vries'), 'Afwachtend');
+((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE WorkshopNotes = 'Dagdagen bootcamp met praktische java sessies.'), (SELECT UserId FROM "User" WHERE Username = 'Janine Doe'), 'Toegewezen'),
+((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE WorkshopNotes = 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.'), (SELECT UserId FROM "User" WHERE Username = 'John de Vries'), 'Toegewezen'),
+((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE WorkshopNotes = 'Dagdagen bootcamp met praktische python sessies.'), (SELECT UserId FROM "User" WHERE Username = 'John de Vries'), 'Afwachtend');
 
 
 INSERT INTO "EmailTemplate" (Name, Content)
@@ -173,6 +174,78 @@ VALUES
 ('Opvolging', 'Beste [Naam], we horen graag uw feedback over de recente workshop die u heeft bijgewoond.');
 
 
+/*
+████████╗██████╗░██╗░██████╗░░██████╗░███████╗██████╗░░██████╗
+╚══██╔══╝██╔══██╗██║██╔════╝░██╔════╝░██╔════╝██╔══██╗██╔════╝
+░░░██║░░░██████╔╝██║██║░░██╗░██║░░██╗░█████╗░░██████╔╝╚█████╗░
+░░░██║░░░██╔══██╗██║██║░░╚██╗██║░░╚██╗██╔══╝░░██╔══██╗░╚═══██╗
+░░░██║░░░██║░░██║██║╚██████╔╝╚██████╔╝███████╗██║░░██║██████╔╝
+░░░╚═╝░░░╚═╝░░╚═╝╚═╝░╚═════╝░░╚═════╝░╚══════╝╚═╝░░╚═╝╚═════╝░
+*/
+GO
+
+
+CREATE TRIGGER MaxUsersOnWorkshop
+ON CommissionWorkshopUser
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Temporary table to store CommissionWorkshopId from inserted or updated rows
+    DECLARE @TempCommissionWorkshop TABLE (
+        CommissionWorkshopId INT
+    );
+
+    -- Insert distinct CommissionWorkshopId from inserted or updated rows into the temporary table
+    INSERT INTO @TempCommissionWorkshop (CommissionWorkshopId)
+    SELECT DISTINCT CommissionWorkshopId
+    FROM inserted;
+
+    DECLARE @CommissionWorkshopId INT;
+    DECLARE @users INT;
+    DECLARE @maxusers INT;
+
+    -- Loop through each CommissionWorkshopId in the temporary table
+    DECLARE cur CURSOR LOCAL FOR
+    SELECT CommissionWorkshopId FROM @TempCommissionWorkshop;
+
+    OPEN cur;
+    FETCH NEXT FROM cur INTO @CommissionWorkshopId;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        -- Count the number of users with status 'Toegewezen' for the current CommissionWorkshopId
+        SELECT @users = COUNT(UserId)
+        FROM CommissionWorkshopUser
+        WHERE CommissionWorkshopId = @CommissionWorkshopId
+          AND Status = 'Toegewezen';
+
+        -- Get the max users allowed for this workshop
+        SELECT @maxusers = MaxUsers
+        FROM CommissionWorkshop
+        WHERE CommissionWorkshopId = @CommissionWorkshopId;
+
+        -- Check if the number of users exceeds the max users allowed
+        IF (@users > @maxusers)
+        BEGIN
+            -- Rollback transaction and raise error
+            ROLLBACK TRANSACTION;
+            RAISERROR('Max users reached. Cannot assign a new user to workshop. The query has been terminated.', 16, 1);
+            RETURN;
+        END
+
+        FETCH NEXT FROM cur INTO @CommissionWorkshopId;
+    END
+
+    CLOSE cur;
+    DEALLOCATE cur;
+
+    SET NOCOUNT OFF;
+END;
+
+
+GO
 /*
 ░██████╗░██╗░░░██╗███████╗██████╗░██╗███████╗░██████╗
 ██╔═══██╗██║░░░██║██╔════╝██╔══██╗██║██╔════╝██╔════╝
@@ -183,7 +256,13 @@ VALUES
 */
 
 -- Get workshops in commissions with no user assigned to it
-SELECT CommissionWorkshopId, CommissionId, StartTime, EndTime, NumberOfParticipants, Address, Level, TargetGroup, Notes, Workshop.WorkshopId, Workshop.Name, Workshop.Category, Workshop.Requirements, Workshop.Description, Workshop.LinkToPicture
+SELECT CommissionWorkshopId, CommissionId, StartTime, EndTime, NumberOfParticipants, Location, Level, TargetGroup, WorkshopNotes, Workshop.WorkshopId, Workshop.Name, Workshop.Category, Workshop.Requirements, Workshop.Description, Workshop.LinkToPicture
 FROM CommissionWorkshop t1
 INNER JOIN Workshop ON t1.WorkshopId = Workshop.WorkshopId
 WHERE NOT EXISTS (SELECT t2.CommissionWorkshopId, t2.Status FROM CommissionWorkshopUser t2 WHERE t1.CommissionWorkshopId = t2.CommissionWorkshopId AND t2.Status = 'Toegewezen')
+
+--Get workshops in commissions and all associated data for front page ordered by data and time
+SELECT CommissionWorkshopId, Workshop.Name, Date, StartTime, EndTime, Requirements, Category, Commission.Name, Location, LinkToPicture FROM CommissionWorkshop
+INNER JOIN Commission ON CommissionWorkshop.CommissionId = Commission.CommissionId
+INNER JOIN Workshop ON CommissionWorkshop.WorkshopId = Workshop.WorkshopId
+ORDER BY Date, StartTime
