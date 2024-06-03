@@ -260,3 +260,9 @@ SELECT CommissionWorkshopId, CommissionId, StartTime, EndTime, NumberOfParticipa
 FROM CommissionWorkshop t1
 INNER JOIN Workshop ON t1.WorkshopId = Workshop.WorkshopId
 WHERE NOT EXISTS (SELECT t2.CommissionWorkshopId, t2.Status FROM CommissionWorkshopUser t2 WHERE t1.CommissionWorkshopId = t2.CommissionWorkshopId AND t2.Status = 'Toegewezen')
+
+--Get workshops in commissions and all associated data for front page ordered by data and time
+SELECT CommissionWorkshopId, Workshop.Name, Date, StartTime, EndTime, Requirements, Category, Commission.Name, Location, LinkToPicture FROM CommissionWorkshop
+INNER JOIN Commission ON CommissionWorkshop.CommissionId = Commission.CommissionId
+INNER JOIN Workshop ON CommissionWorkshop.WorkshopId = Workshop.WorkshopId
+ORDER BY Date, StartTime
