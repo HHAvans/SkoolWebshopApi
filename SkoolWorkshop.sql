@@ -83,7 +83,7 @@ CREATE TABLE "CommissionWorkshop" (
 	NumberOfParticipants INTEGER NOT NULL,
 	Address NVARCHAR(100) NOT NULL,
 	Level NVARCHAR(10) NOT NULL,
-	[Group] NVARCHAR(10) NOT NULL,
+	TargetGroup NVARCHAR(10) NOT NULL,
 	Notes NVARCHAR(1000) NOT NULL
 
 	CONSTRAINT FK_CommissionWorkshop_Commission FOREIGN KEY (CommissionId) REFERENCES Commission (CommissionId)
@@ -153,7 +153,7 @@ VALUES
 ((SELECT ClientId FROM Client WHERE ClientName = 'Wereldwijde Corp'), 'Teambuilding Workshop', 'Wereldwijde Corp Hoofdkantoor', '2024-08-20', 'Een workshop gericht op het verbeteren van de teamcohesie en samenwerking.');
 
 
-INSERT INTO "CommissionWorkshop" (CommissionId, WorkshopId, StartTime, EndTime, NumberOfParticipants, Address, Level, [Group], Notes)
+INSERT INTO "CommissionWorkshop" (CommissionId, WorkshopId, StartTime, EndTime, NumberOfParticipants, Address, Level, TargetGroup, Notes)
 VALUES
 ((SELECT CommissionId FROM "Commission" WHERE Name = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Python Programmeren'), '09:00', '17:00', 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische python sessies.'),
 ((SELECT CommissionId FROM "Commission" WHERE Name = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE Name = 'Java Programmeren'), '09:00', '17:00', 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische java sessies.'),
@@ -183,7 +183,7 @@ VALUES
 */
 
 -- Get workshops in commissions with no user assigned to it
-SELECT *
+SELECT CommissionWorkshopId, CommissionId, StartTime, EndTime, NumberOfParticipants, Address, Level, TargetGroup, Notes, Workshop.WorkshopId, Workshop.Name, Workshop.Category, Workshop.Requirements, Workshop.Description, Workshop.LinkToPicture
 FROM CommissionWorkshop t1
 INNER JOIN Workshop ON t1.WorkshopId = Workshop.WorkshopId
 WHERE NOT EXISTS (SELECT t2.CommissionWorkshopId, t2.Status FROM CommissionWorkshopUser t2 WHERE t1.CommissionWorkshopId = t2.CommissionWorkshopId AND t2.Status = 'Toegewezen')

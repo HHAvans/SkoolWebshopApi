@@ -10,7 +10,7 @@ router.get("/all/nouser", async (req, res) => {
 
   try {
     const pool = await poolPromise;
-    const query = "SELECT * FROM CommissionWorkshop t1 INNER JOIN Workshop ON t1.WorkshopId = Workshop.WorkshopId WHERE NOT EXISTS (SELECT t2.CommissionWorkshopId, t2.Status FROM CommissionWorkshopUser t2 WHERE t1.CommissionWorkshopId = t2.CommissionWorkshopId AND t2.Status = 'Toegewezen')";
+    const query = "SELECT  CommissionWorkshopId, CommissionId, StartTime, EndTime, NumberOfParticipants, Address, Level, TargetGroup, Notes, Workshop.WorkshopId, Workshop.Name, Workshop.Category, Workshop.Requirements, Workshop.Description, Workshop.LinkToPicture FROM CommissionWorkshop t1 INNER JOIN Workshop ON t1.WorkshopId = Workshop.WorkshopId WHERE NOT EXISTS (SELECT t2.CommissionWorkshopId, t2.Status FROM CommissionWorkshopUser t2 WHERE t1.CommissionWorkshopId = t2.CommissionWorkshopId AND t2.Status = 'Toegewezen')";
     console.log("EXECUTING QUERY ON DATABASE: " + query);
     const result = await pool.request().query(query);
     res.json({
