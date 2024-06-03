@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const sendEmail = require('../Utils/emailsender');
 const { sql, poolPromise } = require('../dao/sqldao');
 
 

@@ -16,12 +16,14 @@ const workshopRoutes = require("./src/routes/workshop.js");
 const authenticationRoutes = require("./src/routes/authentication.js");
 const customerRoutes = require("./src/routes/client.js");
 const commissionRoutes = require("./src/routes/commission.js");
+const emailRoutes = require("./src/routes/email.js");
 
 app.use("/user", userRoutes);
 app.use("/workshop", workshopRoutes);
 app.use("/auth", authenticationRoutes);
 app.use("/client", customerRoutes);
 app.use("/commission", commissionRoutes);
+app.use("/templates", emailRoutes);
 
 // Route error handler
 app.use((req, res, next) => {
