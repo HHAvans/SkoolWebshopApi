@@ -20,6 +20,7 @@ app.use("/workshop", workshopRoutes);
 app.use("/auth", authenticationRoutes);
 app.use("/client", customerRoutes);
 app.use("/commission", commissionRoutes);
+app.use("/commission/:id", commissionRoutes);
 
 // Route error handler
 app.use((req, res, next) => {
