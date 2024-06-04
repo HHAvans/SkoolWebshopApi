@@ -36,7 +36,16 @@ router.post('/add', async (req, res) => {
 
     try {
         const pool = await poolPromise;
-        querytodatabase = (`INSERT INTO [Client] VALUES ('${clientname}', '${organisation}', '${targetaudience}', '${contactperson}', '${email}', '${phonenumber}', '${address}', '${kvknumber}')`)
+        querytodatabase = (`INSERT INTO [Client] (
+            [ClientName],
+            [Organisation],
+            [TargetAudience],
+            [ContactPerson],
+            [Email],
+            [PhoneNumber],
+            [Address],
+            [KvkNumber]
+        ) VALUES ('${clientname}', '${organisation}', '${targetaudience}', '${contactperson}', '${email}', '${phonenumber}', '${address}', '${kvknumber}')`)
         console.log('EXECUTING QUERY ON DATABASE: ' + querytodatabase)
         const result = await pool.request().query(querytodatabase)
         res.json({
