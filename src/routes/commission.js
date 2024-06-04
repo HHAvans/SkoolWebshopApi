@@ -138,6 +138,62 @@ router.get("/:id", async (req, res) => {
 });
 
 
+/** add commission (with affiliated workshops)
+
+EXPECTED JSON BODY
+{
+    "": 
+}
+
+*/
+
+router.post('/add', async (req, res) => {
+  console.log('POST /add');
+
+  const body = req.body
+
+  //commission itself
+  const commissionName = body.commissionName
+  const client = body.client
+  const address = body.address
+  const date = body.date
+  const notes = body.notes
+  
+  //workshop in commission
+  const workshop = body.workshop
+  const teachersNeeded = body.teachersNeeded
+  const participants = body.participants
+  const grade = body.grade
+  const level = body.level
+  const startTime = body.startTime
+  const endTime = body.endTime
+  const location = body.location
+  const workshopNotes = body.workshopNotes
+
+
+  try {
+      const pool = await poolPromise;
+      
+      //Queries
+      querytodbcomm = (`INSERT INTO [Commission] VALUES ('${client}', '${commissionName}', '${address}', '${date}', '${notes}')`)
+      querytodbcommworkshop = (`INSERT INTO [CommissionWorkshop] VALUES ('${workshop}', '${startTime}', '${endTime}', '${teachersNeeded}', '${participants}', '${location}', '${level}', '${grade}', '${workshopNotes}')`)
+      console.log('EXECUTING QUERIES ON DATABSE: ' + querytodbcomm + ', ' + querytodbcommworkshop)
+      
+      await Promise.all([
+          pool.request().query(querytodbcomm),
+          pool.request().query(querytodbcommworkshop)
+      ]);
+      
+      res.json({
+          status: 200,
+          message: "Succesfully added commission"
+      });
+  } catch (error) {
+      console.error('Database query error:', error);
+      res.status(500).json({ error: 'Database Query Error'});
+  }
+});
+
 
 
 module.exports = router;
