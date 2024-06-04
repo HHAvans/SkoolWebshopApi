@@ -65,7 +65,7 @@ router.get("/:id", async (req, res) => {
     CW.StartTime, CW.EndTime, CW.Location AS WorkshopAddress, CW.TargetGroup, CW.Level, CW.WorkshopNotes AS WorkshopNotes, 
     CW.NumberOfParticipants, CW.WorkshopId, CW.CommissionWorkshopId,
     CWU.UserId,
-    U.Username, U.Email
+    U.Username, U.Email, U.SalaryPerHourInEuro
       FROM CommissionWorkshop CW
       JOIN Commission C ON C.CommissionId = CW.CommissionId
       LEFT JOIN CommissionWorkshopUser CWU ON CWU.CommissionWorkshopId = CW.CommissionWorkshopId
@@ -121,7 +121,8 @@ router.get("/:id", async (req, res) => {
         workshop.Users.push({
           UserId: row.UserId,
           Username: row.Username,
-          Email: row.Email
+          Email: row.Email,
+          SalaryPerHourInEuro: row.SalaryPerHourInEuro
         });
       }
     });

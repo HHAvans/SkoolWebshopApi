@@ -12,9 +12,9 @@ const { sql, poolPromise } = require('../dao/sqldao.js');
     "clientname": "Example Name",
     "organisation": "Example BV",
     "targetaudience": "Example people",
+    "contactperson": "Example person",
     "email": "example@mail.nl",
     "phonenumber": "31600000000",
-    "contactperson": "Example person",
     "address": "Example 1",
     "kvknumber": "1"
 }
@@ -36,7 +36,16 @@ router.post('/add', async (req, res) => {
 
     try {
         const pool = await poolPromise;
-        querytodatabase = (`INSERT INTO [Client] VALUES ('${clientname}', '${organisation}', '${targetaudience}', '${email}', '${phonenumber}', '${contactperson}', '${address}', '${kvknumber}')`)
+        querytodatabase = (`INSERT INTO [Client] (
+                [ClientName],
+                [Organisation],
+                [TargetAudience],
+                [ContactPerson],
+                [Email],
+                [PhoneNumber],
+                [Address],
+                [KvkNumber]
+            ) VALUES ('${clientname}', '${organisation}', '${targetaudience}', '${email}', '${phonenumber}', '${contactperson}', '${address}', '${kvknumber}')`)
         console.log('EXECUTING QUERY ON DATABASE: ' + querytodatabase)
         const result = await pool.request().query(querytodatabase)
         res.json({
@@ -48,5 +57,24 @@ router.post('/add', async (req, res) => {
         res.status(500).json({ error: 'Database Query Error' });
     }
 });
+
+router.get("/all", async (req, res) => {
+    console.log("GET /all");
+
+    try {
+        const pool = await poolPromise;
+        const query = "SELECT * FROM [Client]";
+        console.log("EXECUTING QUERY ON DATABASE: " + query);
+        const result = await pool.request().query(query);
+        res.json({
+          status: 200,
+          data: result.recordset,
+          message: "Succesfully retrieved all clients",
+        });
+      } catch (error) {
+        console.error("Database query error:", error);
+        res.status(500).json({ error: "Database Query Error" });
+      }
+    });
 
 module.exports = router;
