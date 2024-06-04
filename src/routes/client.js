@@ -12,9 +12,9 @@ const { sql, poolPromise } = require('../dao/sqldao.js');
     "clientname": "Example Name",
     "organisation": "Example BV",
     "targetaudience": "Example people",
+    "contactperson": "Example person",
     "email": "example@mail.nl",
     "phonenumber": "31600000000",
-    "contactperson": "Example person",
     "address": "Example 1",
     "kvknumber": "1"
 }
@@ -28,15 +28,15 @@ router.post('/add', async (req, res) => {
     const clientname = body.clientname
     const organisation = body.organisation
     const targetaudience = body.targetaudience
+    const contactperson = body.contactperson
     const email = body.email
     const phonenumber = body.phonenumber
-    const contactperson = body.contactperson
     const address = body.address
     const kvknumber = body.kvknumber
 
     try {
         const pool = await poolPromise;
-        querytodatabase = (`INSERT INTO [Client] VALUES ('${clientname}', '${organisation}', '${targetaudience}', '${email}', '${phonenumber}', '${contactperson}', '${address}', '${kvknumber}')`)
+        querytodatabase = (`INSERT INTO [Client] VALUES ('${clientname}', '${organisation}', '${targetaudience}', '${contactperson}', '${email}', '${phonenumber}', '${address}', '${kvknumber}')`)
         console.log('EXECUTING QUERY ON DATABASE: ' + querytodatabase)
         const result = await pool.request().query(querytodatabase)
         res.json({
