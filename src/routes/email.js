@@ -39,6 +39,40 @@ router.get('/templates', async (req, res) => {
     }
 });
 
+router.post('/templates', async (req, res) => {
+    console.log('POSt /templates');
+
+    const templateName = req.body.templateName; // Get template name from body
+    const content = req.body.content; // Get content from body
+
+    if (!templateName || !content) {
+        res.status(400).json({ error: 'Template name and/or content is required' });
+        return;
+    }
+
+    try {
+        const pool = await poolPromise;
+        let query = 'UPDATE [EmailTemplate] SET Content = @content WHERE Name = @templateName';
+        console.log('EXECUTING QUERY ON DATABASE: ' + query);
+        await pool.request()
+            .input('templateName', sql.NVarChar, templateName)
+            .input('content', sql.NVarChar, content)
+            .query(query);
+
+        res.status(200).json({
+            status: 200,
+            message: "Email changed succesfully",
+            data: {
+                "templateName": templateName,
+                "content": content
+            }
+        })
+    } catch (error) {
+        console.error('Database query error:', error);
+        res.status(500).json({ error: 'Database Query Error' });
+    }
+});
+
 
 
 
