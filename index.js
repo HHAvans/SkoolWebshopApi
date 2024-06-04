@@ -8,7 +8,8 @@ app.use(cors({
   origin: '*', // Allow all origins (you can restrict this to specific origins if needed)
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   preflightContinue: false,
-  optionsSuccessStatus: 204
+  credentials:true,
+  optionsSuccessStatus: 200
 }));
 app.use(express.json());
 
