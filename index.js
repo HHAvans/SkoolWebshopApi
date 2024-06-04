@@ -4,8 +4,17 @@ const cors = require('cors')
 const app = express();
 const path = require('path');
 
+const corsOptions = {
+  origin: '*', // Allows all origins
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allows all HTTP methods
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+};
 
-app.use(cors())
+app.use(cors(corsOptions));
+
+app.options('*', cors(corsOptions));
+
 app.use(express.json());
 
 
