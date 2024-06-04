@@ -1,15 +1,11 @@
 const express = require("express");
 const { sql, poolPromise } = require("./src/dao/sqldao.js");
-const cors = require("cors");
+const cors = require('cors')
 const app = express();
 const path = require('path');
 
-app.use(cors({
-  origin: '*', // Allow all origins (you can restrict this to specific origins if needed)
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  preflightContinue: false,
-  optionsSuccessStatus: 204
-}));
+
+app.use(cors())
 app.use(express.json());
 
 
