@@ -70,7 +70,7 @@ router.get("/all", async (req, res) => {
  *  Used for the dropdown of the add commissions front-end
  */
 router.get("/allnames", async (req, res) => {
-  console.log("GET /all");
+  console.log("GET /allnames");
 
   try {
     const pool = await poolPromise;

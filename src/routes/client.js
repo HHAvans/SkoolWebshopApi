@@ -68,13 +68,32 @@ router.get("/all", async (req, res) => {
         const result = await pool.request().query(query);
         res.json({
           status: 200,
-          data: result.recordset,
           message: "Succesfully retrieved all clients",
+          data: result.recordset,
         });
       } catch (error) {
         console.error("Database query error:", error);
         res.status(500).json({ error: "Database Query Error" });
       }
+    });
+
+router.get("/allnames", async (req, res) => {
+    console.log("GET /allnames");
+
+    try {
+        const pool = await poolPromise;
+        const query = "SELECT ClientName FROM [Client]";
+        console.log("EXECUTING QUERY ON DATABASE: " + query);
+        const result = await pool.request().query(query);
+        res.json({
+            status: 200,
+            message: "Succesfully retrieved all client names",
+            data: result.recordset,
+        });
+        } catch (error) {
+        console.error("Database query error:", error);
+        res.status(500).json({ error: "Database Query Error" });
+        }
     });
 
 module.exports = router;
