@@ -1,22 +1,21 @@
 const express = require("express");
 const { sql, poolPromise } = require("./src/dao/sqldao.js");
-const cors = require('cors')
+const cors = require("cors");
 const app = express();
-const path = require('path');
+const path = require("path");
 
 const corsOptions = {
-  origin: '*', // Allows all origins
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allows all HTTP methods
+  origin: "*", // Allows all origins
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Allows all HTTP methods
   preflightContinue: false,
-  optionsSuccessStatus: 204
+  optionsSuccessStatus: 204,
 };
 
 app.use(cors(corsOptions));
 
-app.options('*', cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
-
 
 const port = process.env.PORT || 3000; // Port corrected to 3000 for standard practice
 
@@ -29,6 +28,7 @@ const commissionRoutes = require("./src/routes/commission.js");
 const emailRoutes = require("./src/routes/email.js");
 const workshopCommissionRoutes = require("./src/routes/workshopcommission.js");
 const optionsRoutes = require("./src/routes/options.js");
+const validateTokenRoute = require("./src/routes/validateToken.js");
 
 app.use("/user", userRoutes);
 app.use("/workshop", workshopRoutes);
@@ -39,10 +39,11 @@ app.use("/commission/:id", commissionRoutes);
 app.use("/email", emailRoutes);
 app.use("/workshopcommission", workshopCommissionRoutes);
 app.use("/options", optionsRoutes);
+app.use("/auth", validateTokenRoute);
 
 // serve the html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'addCommission.html'));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "addCommission.html"));
 });
 
 // Route error handler
