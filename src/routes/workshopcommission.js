@@ -10,7 +10,31 @@ router.get("/all", async (req, res) => {
 
   try {
     const pool = await poolPromise;
-    const query = "SELECT CommissionWorkshopId, WorkshopName, Date, StartTime, EndTime, Requirements, Category, CommissionName, Location, LinkToPicture FROM CommissionWorkshop INNER JOIN Commission ON CommissionWorkshop.CommissionId = Commission.CommissionId INNER JOIN Workshop ON CommissionWorkshop.WorkshopId = Workshop.WorkshopId ORDER BY Date, StartTime";
+    const query = `
+    SELECT 
+        CommissionWorkshopId, 
+        WorkshopName, 
+        CONVERT(VARCHAR(10), Date, 120) AS Date, 
+        CONVERT(VARCHAR(8), StartTime, 108) AS StartTime, 
+        CONVERT(VARCHAR(8), EndTime, 108) AS EndTime, 
+        Requirements, 
+        Category, 
+        CommissionName, 
+        Location, 
+        LinkToPicture 
+      FROM 
+        CommissionWorkshop 
+      INNER JOIN 
+        Commission 
+      ON 
+        CommissionWorkshop.CommissionId = Commission.CommissionId 
+      INNER JOIN 
+        Workshop 
+      ON 
+        CommissionWorkshop.WorkshopId = Workshop.WorkshopId 
+      ORDER BY 
+        Date, StartTime
+    `;
     console.log("EXECUTING QUERY ON DATABASE: " + query);
     const result = await pool.request().query(query);
     res.json({
