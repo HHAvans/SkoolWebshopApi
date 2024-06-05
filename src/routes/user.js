@@ -43,6 +43,6 @@ router.get('/all', async (req, res) => {
         console.error('Database query error:', error);
         res.status(500).json({ error: 'Database Query Error' });
     }
-});
+}); 
 
 module.exports = router;
