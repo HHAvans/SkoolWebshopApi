@@ -71,11 +71,11 @@ router.get("/all", async (req, res) => {
           message: "Succesfully retrieved all clients",
           data: result.recordset,
         });
-      } catch (error) {
+    } catch (error) {
         console.error("Database query error:", error);
         res.status(500).json({ error: "Database Query Error" });
-      }
-    });
+    }
+});
 
 router.get("/allnames", async (req, res) => {
     console.log("GET /allnames");
@@ -85,15 +85,35 @@ router.get("/allnames", async (req, res) => {
         const query = "SELECT ClientName FROM [Client]";
         console.log("EXECUTING QUERY ON DATABASE: " + query);
         const result = await pool.request().query(query);
-        res.json({
+        res.status(200).json({
             status: 200,
             message: "Succesfully retrieved all client names",
             data: result.recordset,
         });
-        } catch (error) {
-        console.error("Database query error:", error);
-        res.status(500).json({ error: "Database Query Error" });
-        }
-    });
+    } catch (error) {
+    console.error("Database query error:", error);
+    res.status(500).json({ error: "Database Query Error" });
+    }
+});
+
+router.get("/address", async (req, res) => {
+    console.log("GET /address");
+
+    try {
+        const pool = await poolPromise;
+        const query = "SELECT Address FROM [Client] WHERE ClientName = '" + req.body.clientname + "'";
+        console.log("EXECUTING QUERY ON DATABASE: " + query);
+        const result = await pool.request().query(query);
+
+        res.status(200).json({
+            status: 200,
+            message: "Succesfully retrieved client address",
+            data: result.recordset,
+        });
+    } catch (error) {
+    console.error("Database query error:", error);
+    res.status(500).json({ error: "Database Query Error" });
+    }
+});
 
 module.exports = router;
