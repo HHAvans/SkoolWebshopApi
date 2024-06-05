@@ -96,7 +96,7 @@ router.get("/allnames", async (req, res) => {
     }
 });
 
-router.get("/address", async (req, res) => {
+router.post("/address", async (req, res) => {
     console.log("GET /address");
 
     try {
