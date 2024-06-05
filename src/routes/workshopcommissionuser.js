@@ -16,6 +16,12 @@ router.post('/add', async (req, res) => {
     try {
         const pool = await poolPromise;
         query = (`INSERT INTO [WorkshopCommissionUser] VALUES ('${CommissionWorkshopId}', '${userId}', '${status}')`)
+        console.log('EXECUTING QUERY ON DATABASE: ' + query);
+        const result = await pool.request.query(query);
+        res.json({
+            status: 200,
+            message: 'Succesfully added the workshopid, userid and status'
+        });
         
     } catch (error) {
         console.error('Database Query Error: ', error);
@@ -25,3 +31,5 @@ router.post('/add', async (req, res) => {
 
 // voor de update om de status of afgewezen of geaccepteerd te maken
 // 'UPDATE [WorkshopCommissionUser] SET Status = ${newStatus} WHERE UserId = ${userId} AND CommissionWorkshopId = ${commissionWorkshopId}'
+
+module.exports = router;
