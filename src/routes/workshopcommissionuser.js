@@ -4,18 +4,20 @@ const { sql, poolPromise } = require('../dao/sqldao');
 
 // user signs up for a workshop in an assignment
 // the status gets changed to pending - "Afwachtend"
+
+// bekijk de id's -- moeten er dus al zijn en erin gezet worden.
 router.post('/add', async (req, res) => {
     console.log('POST /add');
 
     const body = req.body
 
-    const CommissionWorkshopId = body.CommissionWorkshopId
+    const commissionWorkshopId = body.commissionWorkshopId
     const userId = body.userId
     const status = body.signup
 
     try {
         const pool = await poolPromise;
-        query = (`INSERT INTO [WorkshopCommissionUser] VALUES ('${CommissionWorkshopId}', '${userId}', '${status}')`)
+        query = (`INSERT INTO [WorkshopCommissionUser] VALUES ('${commissionWorkshopId}', '${userId}', '${status}')`)
         console.log('EXECUTING QUERY ON DATABASE: ' + query);
         const result = await pool.request.query(query);
         res.json({
@@ -28,6 +30,26 @@ router.post('/add', async (req, res) => {
         res.status(500).json({ error: 'Database Query Error'});
     }
 })
+
+// get all workshopcommisionusers
+router.get('/all', async (req, res) => {
+    console.log('GET /all');
+
+    try {
+        const pool = await poolPromise;
+        const query = "SELECT * FROM [WorkshopCommissionUser]";
+        console.log("EXECUTING QUERY ON DATABASE: " + query);
+        const result = await pool.request().query(query);
+        res.json({
+          status: 200,
+          data: result.recordset,
+          message: "Succesfully retrieved everything",
+        });
+      } catch (error) {
+        console.error("Database query error:", error);
+        res.status(500).json({ error: "Database Query Error" });
+      }
+    });
 
 // voor de update om de status of afgewezen of geaccepteerd te maken
 // 'UPDATE [WorkshopCommissionUser] SET Status = ${newStatus} WHERE UserId = ${userId} AND CommissionWorkshopId = ${commissionWorkshopId}'
