@@ -48,4 +48,123 @@ router.get("/all", async (req, res) => {
   }
 });
 
+/**
+ * Add a commission and its subsequent workshops into the database.
+ * 
+ * This is one of the more intensive route's with a varying amount of workshops added.
+ * Expected JSON (2 workshops): {
+ *  "commissionname": "",
+ *  "clientname": "", (Must be existing client)
+ *  "address": "",
+ *  "date": "",
+ *  "commissionnotes": "",
+ *  "workshops": [
+ *    {
+ *      "workshopname": "", (Must be existing workshop)
+ *      "maxusers": "",
+ *      "numberofparticipents": "",
+ *      "targetgroup": "",
+ *      "level": "",
+ *      "starttime": "",
+ *      "endtime": "",
+ *      "location": "",
+ *      "workshopnotes": ""
+ *    },
+ *    {
+ *      "workshopname": "",
+ *      "maxusers": "",
+ *      "numberofparticipents": "",
+ *      "targetgroup": "",
+ *      "level": "",
+ *      "starttime": "",
+ *      "endtime": "",
+ *      "location": "",
+ *      "workshopnotes": ""
+ *    }
+ *  ]
+ * }
+ */
+router.post("/add", async (req, res) => {
+  console.log("POST /workshopcommission/add");
+
+  try {
+    const pool = await poolPromise;
+
+    // Prepare the query to get client ID
+    const clientQuery = `
+      DECLARE @ClientID INT;
+      EXEC @ClientID = ClientIdByName @ClientName = @ClientName;
+    `;
+    console.log("EXECUTING QUERY ON DATABASE: " + clientQuery);
+
+    // Execute the query to get client ID
+    const clientResult = await pool.request()
+      .input('ClientName', sql.NVarChar(100), req.body.clientname)
+      .query(clientQuery);
+
+    const clientId = clientResult.recordset[0].ClientId;
+
+    // Insert into Commission table
+    const insertCommissionQuery = `
+      INSERT INTO Commission (ClientId, CommissionName, Address, Date, CommissionNotes) 
+      VALUES (@ClientId, @CommissionName, @Address, @Date, @CommissionNotes);
+      SELECT SCOPE_IDENTITY() AS CommissionId;
+    `;
+    console.log("EXECUTING QUERY ON DATABASE: " + insertCommissionQuery);
+
+    // Execute the insert query for Commission and get the CommissionId
+    const commissionResult = await pool.request()
+      .input('ClientId', sql.Int, clientId)
+      .input('CommissionName', sql.NVarChar(255), req.body.commissionname)
+      .input('Address', sql.NVarChar(255), req.body.address)
+      .input('Date', sql.DateTime, req.body.date)
+      .input('CommissionNotes', sql.NVarChar(255), req.body.commissionnotes)
+      .query(insertCommissionQuery);
+
+    const commissionId = commissionResult.recordset[0].CommissionId;
+
+    // Insert each workshop into Workshop table
+    for (const workshop of req.body.workshops) {
+      // Prepare the query to get workshop ID
+      const workshopIdQuery = `
+        DECLARE @WorkshopId INT;
+        EXEC @WorkshopId = WorkshopIdByName @WorkshopName = @WorkshopName;
+        SELECT @WorkshopId AS WorkshopId;
+      `;
+      console.log("EXECUTING QUERY ON DATABASE: " + workshopIdQuery);
+
+      // Execute the query to get workshop ID
+      const workshopIdResult = await pool.request()
+        .input('WorkshopName', sql.NVarChar(100), workshop.workshopname)
+        .query(workshopIdQuery);
+
+      const workshopId = workshopIdResult.recordset[0].WorkshopId;
+
+      const workshopQuery = `
+        INSERT INTO CommissionWorkshop (CommissionId, WorkshopId, MaxUsers, NumberOfParticipants, TargetGroup, Level, StartTime, EndTime, Location, WorkshopNotes) 
+        VALUES (@CommissionId, @WorkshopId, @MaxUsers, @NumberOfParticipants, @TargetGroup, @Level, @StartTime, @EndTime, @Location, @WorkshopNotes);
+      `;
+      console.log("EXECUTING QUERY ON DATABASE: " + workshopQuery);
+
+      await pool.request()
+        .input('CommissionId', sql.Int, commissionId)
+        .input('WorkshopId', sql.Int, workshopId)
+        .input('MaxUsers', sql.Int, workshop.maxusers)
+        .input('NumberOfParticipants', sql.Int, workshop.numberofparticipents)
+        .input('TargetGroup', sql.NVarChar(255), workshop.targetgroup)
+        .input('Level', sql.NVarChar(255), workshop.level)
+        .input('StartTime', sql.DateTime,`1970-01-01 ${workshop.starttime}`)
+        .input('EndTime', sql.DateTime, `1970-01-01 ${workshop.endtime}`)
+        .input('Location', sql.NVarChar(255), workshop.location)
+        .input('WorkshopNotes', sql.NVarChar(255), workshop.workshopnotes)
+        .query(workshopQuery);
+    }
+
+    res.status(200).json({ message: "Commission and workshops added successfully" });
+  } catch (error) {
+    console.error("Database query error:", error);
+    res.status(500).json({ error: "Database Query Error" });
+  }
+});
+
 module.exports = router;
