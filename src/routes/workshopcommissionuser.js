@@ -9,11 +9,10 @@ const { sql, poolPromise } = require('../dao/sqldao');
 router.post('/add', async (req, res) => {
     console.log('POST /add');
 
-    const body = req.body
 
-    const commissionWorkshopId = body.commissionWorkshopId
-    const userId = body.userId
-    const status = body.signup
+    const commissionWorkshopId = req.params.commissionWorkshopId
+    const userId = req.params.userId
+    const status = req.body.signup
 
     try {
         const pool = await poolPromise;
