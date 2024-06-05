@@ -250,6 +250,56 @@ BEGIN
     SET NOCOUNT OFF;
 END;
 
+GO
+/*
+░██████╗████████╗░█████╗░██████╗░███████╗██████╗░
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██╔══██╗
+╚█████╗░░░░██║░░░██║░░██║██████╔╝█████╗░░██║░░██║
+░╚═══██╗░░░██║░░░██║░░██║██╔══██╗██╔══╝░░██║░░██║
+██████╔╝░░░██║░░░╚█████╔╝██║░░██║███████╗██████╔╝
+╚═════╝░░░░╚═╝░░░░╚════╝░╚═╝░░╚═╝╚══════╝╚═════╝░
+
+██████╗░██████╗░░█████╗░░█████╗░███████╗██████╗░██╗░░░██╗██████╗░███████╗
+██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔══██╗██║░░░██║██╔══██╗██╔════╝
+██████╔╝██████╔╝██║░░██║██║░░╚═╝█████╗░░██║░░██║██║░░░██║██████╔╝█████╗░░
+██╔═══╝░██╔══██╗██║░░██║██║░░██╗██╔══╝░░██║░░██║██║░░░██║██╔══██╗██╔══╝░░
+██║░░░░░██║░░██║╚█████╔╝╚█████╔╝███████╗██████╔╝╚██████╔╝██║░░██║███████╗
+╚═╝░░░░░╚═╝░░╚═╝░╚════╝░░╚════╝░╚══════╝╚═════╝░░╚═════╝░╚═╝░░╚═╝╚══════╝
+*/
+
+DROP PROCEDURE IF EXISTS WorkshopIdByName;
+GO
+
+CREATE PROCEDURE WorkshopIdByName @WorkshopName NVARCHAR(100)
+AS
+Print 'Called'
+SELECT TOP 1 WorkshopId
+FROM Workshop
+WHERE WorkshopName = @WorkshopName
+GO
+
+/*
+
+EXEC WorkshopIdByName @WorkshopName = 'Vloggen'
+
+*/
+
+DROP PROCEDURE IF EXISTS ClientIdByName;
+GO
+
+CREATE PROCEDURE ClientIdByName @ClientName NVARCHAR(100)
+AS
+Print 'Called'
+SELECT TOP 1 ClientId
+FROM Client
+WHERE ClientName = @ClientName
+GO
+
+/*
+
+EXEC ClientIdByName @ClientName = 'Avans Informatica B'
+
+*/
 
 GO
 /*
