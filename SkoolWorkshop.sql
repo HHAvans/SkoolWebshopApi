@@ -127,51 +127,57 @@ CREATE TABLE "EmailTemplate" (
 ░░░╚═╝░░░╚═╝░░╚═╝╚══════╝░╚═════╝░╚══════╝╚═════╝░
 */ GO
 
-INSERT INTO "User" (Username, Birthdate, City, Address, Email, Password, PhoneNumber, PostalCode, BTWNumber, KVKNumber, BankId, Role, Permission, SalaryPerHourInEuro, UsesPublicTransit, HasCar, HasLicense)
-VALUES
+INSERT INTO "User" (Username, Birthdate, City, Address, Email, Password, PhoneNumber, PostalCode, BTWNumber, KVKNumber, BankId, Role, Permission, SalaryPerHourInEuro, UsesPublicTransit, HasCar, HasLicense) VALUES
 ('Janine Doe', '1990-05-15', 'Rotterdam', 'Hoofdstraat 123', 'janine.doe@example.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2', '+31611111111', '3000AA', NULL, NULL, 'NL34RABO0123456789', 'Flex', 'Default', 50.00, 1, 0, 0),
 ('John de Vries', '1985-11-30', 'Amsterdam', 'Grachtstraat 456', 'john.devries@example.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2', '+31622222222', '1011AB', '9876543', '1234567', 'NL44ABNA0123456789', 'ZZP', 'Moderator', 75.00, 0, 1, 1),
 ('Clinten Pique', '1999-02-02', 'Breda', 'Lovensdijkstraat 61', 'info@skoolworkshop.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2' ,'+316000000', '4614RM', '5641421', '4542522', 'NL06241231231312', 'ZZP', 'Admin', 100, 0, 1, 1);
 
 
-INSERT INTO Workshop (WorkshopName, Category, Requirements, Description, LinkToPicture)
-VALUES
+INSERT INTO Workshop (WorkshopName, Category, Requirements, Description, LinkToPicture) VALUES
 ('Vloggen', 'Kunst', 'Camera, Geheugenkaart', 'Leer de basisprincipes van vloggen en verbeter je vaardigheden.', 'https://skoolworkshop.nl/wp-content/uploads/2019/12/Vlog-Workshop-op-school-1024x652.jpg'),
 ('Openbaar Spreken', 'Communicatie', 'Geen', 'Overwin je angst voor spreken in het openbaar met onze deskundige begeleiding.', 'https://skoolworkshop.nl/wp-content/uploads/2020/09/Jongens-rap-e1643291580110-1024x653.jpg'),
 ('Python Programmeren', 'Technologie', 'Laptop', 'Introductie tot Python programmeren voor beginners.', 'https://skoolworkshop.nl/wp-content/uploads/2023/09/Workshop-Podcast-Maken.jpg'),
 ('Java Programmeren', 'Technologie', 'Laptop', 'Introductie tot Java programmeren voor beginners.', 'https://skoolworkshop.nl/wp-content/uploads/2023/09/Workshop-Podcast-Maken.jpg');
 
 
-INSERT INTO Client (ClientName, Organisation, TargetAudience, ContactPerson, Email, PhoneNumber, Address, KvkNumber)
-VALUES
+INSERT INTO Client (ClientName, Organisation, TargetAudience, ContactPerson, Email, PhoneNumber, Address, KvkNumber) VALUES
+('Avans Informatica B', 'Avans Hogeschool B.V', 'Studenten', 'Marjolein Gerdes', 'mj.gerdes@avans.nl', '+31633335555', 'Lovensdijkstraat 63', 854321),
 ('Technische Universiteit', 'Technische Universiteit Inc.', 'Studenten', 'Sarah Lee', 'sarah.lee@technischeuniversiteit.com', '+31644445555', 'Technologische Laan 42', 654321),
 ('Wereldwijde Corp', 'Wereldwijde Corporatie', 'Werknemers', 'Michael Bruin', 'michael.bruin@wereldwijdecorp.com', '+31655556666', 'Zakelijk Plaza 78', 987654);
 
 
-INSERT INTO "Commission" (ClientId, CommissionName, Address, Date, CommissionNotes)
-VALUES
+INSERT INTO "Commission" (ClientId, CommissionName, Address, Date, CommissionNotes) VALUES
 ((SELECT ClientId FROM Client WHERE ClientName = 'Technische Universiteit'), 'Programmeren Bootcamp', 'Technische Universiteit Campus', '2024-07-15', 'Een uitgebreide bootcamp over programmeren.'),
 ((SELECT ClientId FROM Client WHERE ClientName = 'Wereldwijde Corp'), 'Teambuilding Workshop', 'Wereldwijde Corp Hoofdkantoor', '2024-08-20', 'Een workshop gericht op het verbeteren van de teamcohesie en samenwerking.');
 
 
-INSERT INTO "CommissionWorkshop" (CommissionId, WorkshopId, StartTime, EndTime, MaxUsers, NumberOfParticipants, Location, Level, TargetGroup, WorkshopNotes)
-VALUES
+INSERT INTO "CommissionWorkshop" (CommissionId, WorkshopId, StartTime, EndTime, MaxUsers, NumberOfParticipants, Location, Level, TargetGroup, WorkshopNotes) VALUES
 ((SELECT CommissionId FROM "Commission" WHERE CommissionName = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE WorkshopName = 'Python Programmeren'), '09:00', '17:00', 1, 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische python sessies.'),
 ((SELECT CommissionId FROM "Commission" WHERE CommissionName = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE WorkshopName = 'Java Programmeren'), '09:00', '17:00', 1, 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische java sessies.'),
 ((SELECT CommissionId FROM "Commission" WHERE CommissionName = 'Teambuilding Workshop'), (SELECT WorkshopId FROM Workshop WHERE WorkshopName = 'Openbaar Spreken'), '13:00', '15:00', 2, 25, 'Wereldwijde Corp Hoofdkantoor', 'Beginner', 'C', 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.');
 
 
-INSERT INTO "CommissionWorkshopUser" (CommissionWorkshopId, UserId, Status)
-VALUES
+INSERT INTO "CommissionWorkshopUser" (CommissionWorkshopId, UserId, Status) VALUES
 ((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE WorkshopNotes = 'Dagdagen bootcamp met praktische java sessies.'), (SELECT UserId FROM "User" WHERE Username = 'Janine Doe'), 'Toegewezen'),
 ((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE WorkshopNotes = 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.'), (SELECT UserId FROM "User" WHERE Username = 'John de Vries'), 'Toegewezen'),
 ((SELECT CommissionWorkshopId FROM "CommissionWorkshop" WHERE WorkshopNotes = 'Dagdagen bootcamp met praktische python sessies.'), (SELECT UserId FROM "User" WHERE Username = 'John de Vries'), 'Afwachtend');
 
 
-INSERT INTO "EmailTemplate" (Name, Content)
-VALUES
-('Bedankt', 'Beste [Naam], bedankt voor uw deelname aan onze workshop. We hopen dat u een geweldige ervaring had.'),
-('Opvolging', 'Beste [Naam], we horen graag uw feedback over de recente workshop die u heeft bijgewoond.');
+INSERT INTO "EmailTemplate" (Name, Content) VALUES
+('Approval', 'Beste {FirstName},' + CHAR(13) + CHAR(13) + 'Leuk dat je een workshop wil verzorgen voor Skool Workshop. Met deze mail is jouw workshop voor {Customer} bevestigd.' + CHAR(13) + CHAR(13) + 'Je wordt verwacht op {ExecutionDate} om {StartTime}.' + CHAR(13) + CHAR(13) + 'De workshop start om {FirstRoundStartTime} en eindigt om {LastRoundEndTime}. Als je ervoor kiest om materialen van Skool Workshop te gebruiken, ben je verantwoordelijk voor het gebruik, het ophalen, terugbrengen en het voorkomen van schade of verlies. Login op jouw account om de workshop details te bekijken. Wij wensen je alvast veel plezier!' + CHAR(13) + CHAR(13) + 'Met vriendelijke groeten, Team Skool Workshop Veilingkade 15 | 4815 HC Breda | Tel. 085 - 0653923 | App. 06 - 28318842 Mail. info@skoolworkshop.nl | Web. www.skoolworkshop.n'),
+
+('AvailabilityConfirmation', 'Beste {FirstName}, ' + CHAR(13) + CHAR(13) + 'Je beschikbaarheid voor de {Workshop} op {ExecutionDate} is goed ontvangen. Zodra je bent ingepland ontvang je een bevestigingsmail.' + CHAR(13) + CHAR(13) + 'Met vriendelijke groeten, Team Skool Workshop Veilingkade 15 | 4815 HC Breda | Tel. 085 - 0653923 | App. 06 - 28318842 Mail. info@skoolworkshop.nl | Web. www.skoolworkshop.nl'),
+
+('AvailabilityRejection', 'Beste {FirstName},' + CHAR(13) + CHAR(13) + 'Jouw beschikbaarheid voor de {Workshop} voor {Customer} op {ExecutionDate} is geweigerd.' + CHAR(13) + CHAR(13) + 'Reden: {Reason}' + CHAR(13) + CHAR(13) + 'We hopen je snel weer in te kunnen zetten.' + CHAR(13) + CHAR(13) + 'Met vriendelijke groeten, Team Skool Workshop Veilingkade 15 | 4815 HC Breda | Tel. 085 - 0653923 | App. 06 - 28318842 Mail. info@skoolworkshop.nl | Web. www.skoolworkshop.nl'),
+
+('AvailabilityRequest', 'Beste {FirstName}, Ben jij beschikbaar voor een {Workshop} op {ExecutionDate} van {FirstRoundStartTime} tot {LastRoundEndTime} in {City}? Login op jouw account om de workshop details te bekijken. We zien je reactie graag tegemoet.' + CHAR(13) + CHAR(13) + 'Met vriendelijke groeten, Team Skool Workshop Veilingkade 15 | 4815 HC Breda | Tel. 085 - 0653923 | App. 06 - 28318842 Mail. info@skoolworkshop.nl | Web. www.skoolworkshop.nl'),
+
+('BackupList', 'Beste {FirstName}, Je aanmelding is in goede orde ontvangen. Voor de {Workshop} op {ExecutionDate} in {City} is er al een andere workshopdocent ingepland. We hebben je toegevoegd aan de back-up lijst. Mocht de huidige workshopdocent uitvallen, dan zullen wij jou benaderen.' + CHAR(13) + CHAR(13) + 'Met vriendelijke groeten, Team Skool Workshop Veilingkade 15 | 4815 HC Breda | Tel. 085 - 0653923 | App. 06 - 28318842 Mail. info@skoolworkshop.nl | Web. www.skoolworkshop.nl'),
+
+('Cancellation', 'Beste {FirstName},' + CHAR(13) + CHAR(13) + 'We hebben uw annulering voor de {Workshop} op {ExecutionDate} in {City} ontvangen.' + CHAR(13) + CHAR(13) + 'Reden: {Reden}' + CHAR(13) + CHAR(13) + 'We hopen je snel weer in te kunnen zetten.' + CHAR(13) + CHAR(13) + 'Met vriendelijke groeten, Team Skool Workshop Veilingkade 15 | 4815 HC Breda | Tel. 085 – 0653923 | App. 06 – 28318842 Mail. info@skoolworkshop.nl | Web. www.skoolworkshop.nl'),
+
+('RegistrationConfirmation', 'Beste {FirstName},' + CHAR(13) + CHAR(13) + 'Leuk dat je ons team wil versterken met het geven van workshops.' + CHAR(13) + CHAR(13) + 'Wij hebben je opgenomen in ons docentenregister. Login om jouw profiel bij te werken, zodat jij jezelf kan gaan aanmelden voor opdrachten.' + CHAR(13) + CHAR(13) + 'Met vriendelijke groeten, Team Skool Workshop Veilingkade 15 | 4815 HC Breda | Tel. 085 - 0653923 | App. 06 - 28318842 Mail. info@skoolworkshop.nl | Web. www.skoolworkshop.nl');
+
 
 
 /*
