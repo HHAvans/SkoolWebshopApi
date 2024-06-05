@@ -29,6 +29,7 @@ const emailRoutes = require("./src/routes/email.js");
 const workshopCommissionRoutes = require("./src/routes/workshopcommission.js");
 const optionsRoutes = require("./src/routes/options.js");
 const validateTokenRoute = require("./src/routes/validateToken.js");
+const workshopCommissionUserRoutes = require("./src/routes/workshopcommissionuser.js");
 
 app.use("/user", userRoutes);
 app.use("/workshop", workshopRoutes);
@@ -40,6 +41,7 @@ app.use("/email", emailRoutes);
 app.use("/workshopcommission", workshopCommissionRoutes);
 app.use("/options", optionsRoutes);
 app.use("/auth", validateTokenRoute);
+app.use("/workshopcommissionuser", workshopCommissionUserRoutes);
 
 // serve the html
 app.get("/", (req, res) => {
