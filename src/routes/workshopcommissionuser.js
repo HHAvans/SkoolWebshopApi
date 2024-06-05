@@ -10,13 +10,13 @@ router.post('/add', async (req, res) => {
     console.log('POST /add');
 
 
-    const commissionWorkshopId = req.params.commissionWorkshopId
-    const userId = req.params.userId
+    const commissionWorkshopId = req.body.commissionWorkshopId
+    const userId = req.body.userId
     const status = req.body.signup
 
     try {
         const pool = await poolPromise;
-        query = (`INSERT INTO [CommissionWorkshopUser] VALUES ('${commissionWorkshopId}', '${userId}', '${status}')`)
+        query = (`INSERT INTO [CommissionWorkshopUser] (CommissionWorkshopId, UserId, Status) VALUES (${commissionWorkshopId}, ${userId}, '${status}')`)
         console.log('EXECUTING QUERY ON DATABASE: ' + query);
         const result = await pool.request.query(query);
         res.json({
