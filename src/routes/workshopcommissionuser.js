@@ -9,20 +9,19 @@ const { sql, poolPromise } = require('../dao/sqldao');
 router.post('/add', async (req, res) => {
     console.log('POST /add');
 
-    const body = req.body
 
-    const commissionWorkshopId = body.commissionWorkshopId
-    const userId = body.userId
-    const status = body.signup
+    const commissionWorkshopId = req.params.commissionWorkshopId
+    const userId = req.params.userId
+    const status = req.body.signup
 
     try {
         const pool = await poolPromise;
-        query = (`INSERT INTO [WorkshopCommissionUser] VALUES ('${commissionWorkshopId}', '${userId}', '${status}')`)
+        query = (`INSERT INTO [CommissionWorkshopUser] VALUES ('${commissionWorkshopId}', '${userId}', '${status}')`)
         console.log('EXECUTING QUERY ON DATABASE: ' + query);
         const result = await pool.request.query(query);
         res.json({
             status: 200,
-            message: 'Succesfully added the workshopid, userid and status'
+            message: 'Succesfully added the commissionworkshopid, userid and status'
         });
         
     } catch (error) {
@@ -37,7 +36,7 @@ router.get('/all', async (req, res) => {
 
     try {
         const pool = await poolPromise;
-        const query = "SELECT * FROM [WorkshopCommissionUser]";
+        const query = "SELECT * FROM [CommissionWorkshopUser]";
         console.log("EXECUTING QUERY ON DATABASE: " + query);
         const result = await pool.request().query(query);
         res.json({
