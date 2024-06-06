@@ -150,7 +150,7 @@ function replacePlaceholders(template, data) {
     let text = template;
     for (const key in data) {
         const placeholder = `{${key}}`;
-        text = text.replace(new RegExp(placeholder, 'g'), data[key]);
+        text = text.replace(new RegExp(placeholder, 'g'), data[key] || ''); // Replace with empty string if data is missing
     }
     return text;
 }
@@ -158,9 +158,7 @@ function replacePlaceholders(template, data) {
 // Send email with template and user data
 router.post('/send', async (req, res) => {
     const { userId, templateName, emailSubject } = req.body;
-
-    console.log(req.body);
-
+    
     try {
         const pool = await poolPromise;
 
@@ -174,7 +172,6 @@ router.post('/send', async (req, res) => {
         }
         const template = templateResult.recordset[0].CONTENT;
 
-        console.log(template)
         // Fetch user data
         const userResult = await pool.request()
             .input('userId', sql.Int, userId)
@@ -185,17 +182,17 @@ router.post('/send', async (req, res) => {
         }
         const userData = userResult.recordset[0];
 
+        // Print userData for debugging
         console.log(userData);
 
         // Replace placeholders
         const emailText = replacePlaceholders(template, userData);
 
-        console.log(emailText, template, userData)
+        // Wrap in HTML
+        const emailHtml = wrapInHtml(emailText);
 
         // Send email
-        await sendEmail(userData.Email, emailSubject, emailText);
-
-        console.log(userData.Email)
+        await sendEmail(userData.Email, emailSubject, emailHtml);
 
         res.status(200).json({ message: 'Email sent successfully' });
     } catch (error) {
