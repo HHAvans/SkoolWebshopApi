@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { sql, poolPromise } = require('../dao/sqldao');
-const { sendEmail } = require('../services/emailService');
+const { sendEmail, wrapInHtml } = require('../services/emailService');
 
 
 
@@ -158,7 +158,7 @@ function replacePlaceholders(template, data) {
 // Send email with template and user data
 router.post('/send', async (req, res) => {
     const { userId, templateName, emailSubject } = req.body;
-    
+
     try {
         const pool = await poolPromise;
 
