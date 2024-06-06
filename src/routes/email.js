@@ -106,25 +106,22 @@ router.get('/mail-name/:id', async (req, res) => {
         const pool = await poolPromise;
         const query = `
         SELECT 
-            u.Username,
-            u.Email,
-            cw.StartTime,
-            cw.EndTime,
-            cw.Location,
-            w.WorkshopName,
-            c.ClientName
-        FROM 
-            [User] u
-        JOIN 
-            CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
-        JOIN 
-            CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
-        JOIN 
-            Workshop w ON cw.WorkshopId = w.WorkshopId
-        JOIN 
-            Client c ON cw.ClientId = c.ClientId
-        WHERE 
-            u.UserId = @userId;
+        u.Username,
+        u.Email,
+        cw.StartTime,
+        cw.EndTime,
+        cw.Location,
+        w.WorkshopName
+    FROM 
+        "User" u
+    JOIN 
+        CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
+    JOIN 
+        CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
+    JOIN 
+        Workshop w ON cw.WorkshopId = w.WorkshopId
+    WHERE 
+        u.UserId = @userId;
     `;
         const result = await pool.request()
             .input('userId', sql.Int, userId)
@@ -177,25 +174,22 @@ router.post('/send', async (req, res) => {
             .input('userId', sql.Int, userId)
             .query(`
             SELECT 
-                u.Username,
-                u.Email,
-                cw.StartTime,
-                cw.EndTime,
-                cw.Location,
-                w.WorkshopName,
-                c.ClientName
-            FROM 
-                [User] u
-            JOIN 
-                CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
-            JOIN 
-                CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
-            JOIN 
-                Workshop w ON cw.WorkshopId = w.WorkshopId
-            JOIN 
-                Client c ON cw.ClientId = c.ClientId
-            WHERE 
-                u.UserId = @userId;
+            u.Username,
+            u.Email,
+            cw.StartTime,
+            cw.EndTime,
+            cw.Location,
+            w.WorkshopName
+        FROM 
+            "User" u
+        JOIN 
+            CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
+        JOIN 
+            CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
+        JOIN 
+            Workshop w ON cw.WorkshopId = w.WorkshopId
+        WHERE 
+            u.UserId = @userId;
         `);
 
         if (userResult.recordset.length === 0) {
