@@ -87,10 +87,12 @@ router.get("/all", async (req, res) => {
 router.post("/add", async (req, res) => {
   console.log("POST /workshopcommission/add");
 
+  console.log('Body: \n' + req.body)
+
   try {
     const pool = await poolPromise;
 
-    // Prepare the query to get client ID
+    // Prepare the query to get client ID 
     const clientQuery = `
       DECLARE @ClientID INT;
       EXEC @ClientID = ClientIdByName @ClientName = @ClientName;
