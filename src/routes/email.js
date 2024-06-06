@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { sql, poolPromise } = require('../dao/sqldao');
-const { sendEmail } = require('../services/emailService');
+const { sendEmail, wrapInHtml } = require('../services/emailService');
 
 
 
@@ -100,19 +100,38 @@ router.get('/template/:name', async (req, res) => {
 });
 
 // Fetch user data
-router.get('/mail-name', async (req, res) => {
+router.get('/mail-name/:id', async (req, res) => {
     const userId = req.params.id;
     try {
         const pool = await poolPromise;
+        const query = `
+        SELECT 
+        u.Username,
+        u.Email,
+        cw.StartTime,
+        cw.EndTime,
+        cw.Location,
+        w.WorkshopName
+    FROM 
+        "User" u
+    JOIN 
+        CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
+    JOIN 
+        CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
+    JOIN 
+        Workshop w ON cw.WorkshopId = w.WorkshopId
+    WHERE 
+        u.UserId = @userId;
+    `;
         const result = await pool.request()
             .input('userId', sql.Int, userId)
-            .query('SELECT * FROM [User] WHERE UserId = @userId');
+            .query(query);
 
         if (result.recordset.length > 0) {
             res.status(200).json({
                 status: 200,
                 message: "User data retrieved successfully",
-                data: result.recordset[0]
+                data: result.recordset
             });
         } else {
             res.status(404).json({ error: 'User not found' });
@@ -128,7 +147,7 @@ function replacePlaceholders(template, data) {
     let text = template;
     for (const key in data) {
         const placeholder = `{${key}}`;
-        text = text.replace(new RegExp(placeholder, 'g'), data[key]);
+        text = text.replace(new RegExp(placeholder, 'g'), data[key] || ''); // Replace with empty string if data is missing
     }
     return text;
 }
@@ -136,8 +155,6 @@ function replacePlaceholders(template, data) {
 // Send email with template and user data
 router.post('/send', async (req, res) => {
     const { userId, templateName, emailSubject } = req.body;
-
-    console.log(req.body);
 
     try {
         const pool = await poolPromise;
@@ -152,28 +169,45 @@ router.post('/send', async (req, res) => {
         }
         const template = templateResult.recordset[0].CONTENT;
 
-        console.log(template)
         // Fetch user data
         const userResult = await pool.request()
             .input('userId', sql.Int, userId)
-            .query('SELECT * FROM [User] WHERE UserId = @userId');
+            .query(`
+            SELECT 
+            u.Username,
+            u.Email,
+            cw.StartTime,
+            cw.EndTime,
+            cw.Location,
+            w.WorkshopName
+        FROM 
+            "User" u
+        JOIN 
+            CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
+        JOIN 
+            CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
+        JOIN 
+            Workshop w ON cw.WorkshopId = w.WorkshopId
+        WHERE 
+            u.UserId = @userId;
+        `);
 
         if (userResult.recordset.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
         const userData = userResult.recordset[0];
 
+        // Print userData for debugging
         console.log(userData);
 
         // Replace placeholders
         const emailText = replacePlaceholders(template, userData);
 
-        console.log(emailText, template, userData)
+        // Wrap in HTML
+        const emailHtml = wrapInHtml(emailText);
 
         // Send email
-        await sendEmail(userData.Email, emailSubject, emailText);
-
-        console.log(userData.Email)
+        await sendEmail(userData.Email, emailSubject, emailHtml);
 
         res.status(200).json({ message: 'Email sent successfully' });
     } catch (error) {
