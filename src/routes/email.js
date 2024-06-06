@@ -175,7 +175,28 @@ router.post('/send', async (req, res) => {
         // Fetch user data
         const userResult = await pool.request()
             .input('userId', sql.Int, userId)
-            .query('SELECT * FROM [User] WHERE UserId = @userId');
+            .query(`
+            SELECT 
+                u.Username,
+                u.Email,
+                cw.StartTime,
+                cw.EndTime,
+                cw.Location,
+                w.WorkshopName,
+                c.ClientName
+            FROM 
+                [User] u
+            JOIN 
+                CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
+            JOIN 
+                CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
+            JOIN 
+                Workshop w ON cw.WorkshopId = w.WorkshopId
+            JOIN 
+                Client c ON cw.ClientId = c.ClientId
+            WHERE 
+                u.UserId = @userId;
+        `);
 
         if (userResult.recordset.length === 0) {
             return res.status(404).json({ error: 'User not found' });
