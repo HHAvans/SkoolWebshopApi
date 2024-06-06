@@ -100,19 +100,41 @@ router.get('/template/:name', async (req, res) => {
 });
 
 // Fetch user data
-router.get('/mail-name', async (req, res) => {
+router.get('/mail-name/:id', async (req, res) => {
     const userId = req.params.id;
     try {
         const pool = await poolPromise;
+        const query = `
+        SELECT 
+            u.Username,
+            u.Email,
+            cw.StartTime,
+            cw.EndTime,
+            cw.Location,
+            w.WorkshopName,
+            c.ClientName
+        FROM 
+            [User] u
+        JOIN 
+            CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
+        JOIN 
+            CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
+        JOIN 
+            Workshop w ON cw.WorkshopId = w.WorkshopId
+        JOIN 
+            Client c ON cw.ClientId = c.ClientId
+        WHERE 
+            u.UserId = @userId;
+    `;
         const result = await pool.request()
             .input('userId', sql.Int, userId)
-            .query('SELECT * FROM [User] WHERE UserId = @userId');
+            .query(query);
 
         if (result.recordset.length > 0) {
             res.status(200).json({
                 status: 200,
                 message: "User data retrieved successfully",
-                data: result.recordset[0]
+                data: result.recordset
             });
         } else {
             res.status(404).json({ error: 'User not found' });
