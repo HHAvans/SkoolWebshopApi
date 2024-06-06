@@ -4,6 +4,7 @@ const cors = require("cors");
 const app = express();
 const path = require("path");
 
+
 const corsOptions = {
   origin: "*", // Allows all origins
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Allows all HTTP methods
@@ -70,3 +71,12 @@ app.use((error, req, res, next) => {
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server is running on port ${port}`);
 });
+
+// Helper function to replace placeholders in text with actual data
+function replacePlaceholders(textWithPlaceholders, userData) {
+  // Replace placeholders with actual data
+  let text = textWithPlaceholders.replace("{name}", userData.name);
+  text = text.replace("{email}", userData.email);
+  // Add more replacements as needed
+  return text;
+}

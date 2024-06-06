@@ -9,26 +9,33 @@ const { sql, poolPromise } = require('../dao/sqldao');
 router.post('/add', async (req, res) => {
     console.log('POST /add');
 
+    // Retrieve values from the request body
+    const commissionWorkshopId = 2//req.body.commissionWorkshopId; //!!!
+    const userId = 2// req.body.userId; //!!!
+    const status = 'Afwachtend'; // Hardcoded as the default status //!!!
 
-    const commissionWorkshopId = req.body.commissionWorkshopId
-    const userId = req.body.userId
-    const status = req.body.signup
+    console.log(commissionWorkshopId, userId, status);
 
     try {
         const pool = await poolPromise;
-        query = (`INSERT INTO [CommissionWorkshopUser] (CommissionWorkshopId, UserId, Status) VALUES (${commissionWorkshopId}, ${userId}, '${status}')`)
+        const query = 'INSERT INTO [CommissionWorkshopUser] (CommissionWorkshopId, UserId, Status) VALUES (@commissionWorkshopId, @userId, @status)'; //!!!
+
         console.log('EXECUTING QUERY ON DATABASE: ' + query);
-        const result = await pool.request.query(query);
+        await pool.request() //!!!
+            .input('commissionWorkshopId', sql.Int, commissionWorkshopId) //!!!
+            .input('userId', sql.Int, userId) //!!!
+            .input('status', sql.VarChar, status) //!!!
+            .query(query);
+
         res.json({
             status: 200,
-            message: 'Succesfully added the commissionworkshopid, userid and status'
+            message: 'Successfully added the commissionWorkshopId, userId, and status' //!!!
         });
-        
     } catch (error) {
         console.error('Database Query Error: ', error);
-        res.status(500).json({ error: 'Database Query Error'});
+        res.status(500).json({ error: 'Database Query Error' });
     }
-})
+});
 
 // get all workshopcommisionusers
 router.get('/all', async (req, res) => {
