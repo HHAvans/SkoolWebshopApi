@@ -272,12 +272,10 @@ GO
 
 CREATE PROCEDURE WorkshopIdByName @WorkshopName NVARCHAR(100)
 AS
-Print 'Called'
 SELECT TOP 1 WorkshopId
 FROM Workshop
 WHERE WorkshopName = @WorkshopName
 GO
-
 /*
 
 EXEC WorkshopIdByName @WorkshopName = 'Vloggen'
@@ -289,15 +287,33 @@ GO
 
 CREATE PROCEDURE ClientIdByName @ClientName NVARCHAR(100)
 AS
-Print 'Called'
 SELECT TOP 1 ClientId
 FROM Client
 WHERE ClientName = @ClientName
 GO
-
 /*
 
 EXEC ClientIdByName @ClientName = 'Avans Informatica B'
+
+*/
+
+-- Get all workshops in commissions where a user has been assigned to
+DROP PROCEDURE IF EXISTS WorkshopCommissionsWithUserAssigned;
+GO
+
+CREATE PROCEDURE WorkshopCommissionsWithUserAssigned @UserId INT
+AS
+SELECT CommissionWorkshop.CommissionWorkshopId, WorkshopName, CONVERT(VARCHAR(10), Date, 120) AS Date, CONVERT(VARCHAR(8), StartTime, 108) AS StartTime, CONVERT(VARCHAR(8), EndTime, 108) AS EndTime, Requirements, Category, CommissionName, Location, LinkToPicture, CommissionWorkshopUser.UserId, CommissionWorkshopUser.Status
+FROM CommissionWorkshop 
+INNER JOIN Commission ON CommissionWorkshop.CommissionId = Commission.CommissionId 
+INNER JOIN Workshop ON CommissionWorkshop.WorkshopId = Workshop.WorkshopId 
+INNER JOIN CommissionWorkshopUser ON CommissionWorkshop.CommissionWorkshopId = CommissionWorkshopUser.CommissionWorkshopId
+WHERE CommissionWorkshopUser.UserId = @UserId AND Status = 'Toegewezen'
+ORDER BY Date, StartTime;
+GO
+/*
+
+EXEC WorkshopCommissionsWithUserAssigned @UserId = 1
 
 */
 

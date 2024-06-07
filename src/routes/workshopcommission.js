@@ -54,39 +54,12 @@ router.get("/:id", async (req, res) => {
 
   try {
     const pool = await poolPromise;
-    const query = `
-    SELECT 
-    CommissionWorkshopId, 
-    WorkshopName, 
-    CONVERT(VARCHAR(10), Date, 120) AS Date, 
-    CONVERT(VARCHAR(8), StartTime, 108) AS StartTime, 
-    CONVERT(VARCHAR(8), EndTime, 108) AS EndTime, 
-    Requirements, 
-    Category, 
-    CommissionName, 
-    Location, 
-    LinkToPicture 
-FROM 
-    CommissionWorkshop 
-INNER JOIN 
-    Commission 
-ON 
-    CommissionWorkshop.CommissionId = Commission.CommissionId 
-INNER JOIN 
-    Workshop 
-ON 
-    CommissionWorkshop.WorkshopId = Workshop.WorkshopId 
-WHERE 
-    CommissionWorkshop.userId = ${req.params.id};
-ORDER BY 
-    Date, 
-    StartTime;
-    `;
+    const query = `EXEC WorkshopCommissionsWithUserAssigned @UserId = ${req.params.id}`;
     console.log("EXECUTING QUERY ON DATABASE: " + query);
     const result = await pool.request().query(query);
     res.json({
       status: 200,
-      message: "Succesfully retrieved workshops in commissions and all associated data",
+      message: "Succesfully retrieved workshops in commissions and all associated data where an user is assigned to",
       data: result.recordset,
     });
   } catch (error) {
