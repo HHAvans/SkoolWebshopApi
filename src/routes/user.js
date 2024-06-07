@@ -126,8 +126,8 @@ router.delete('/delete', async (req, res) => {
     console.log('Request body:', req.body);
 
     try {
-        const { userName } = req.body;
-        if (!userName) {
+        const { Username } = req.body; // Expect 'Username' in the request body
+        if (!Username) {
             return res.status(400).json({ status: 400, message: 'Username is required' });
         }
 
@@ -135,7 +135,7 @@ router.delete('/delete', async (req, res) => {
         console.log('Executing query on database: DELETE FROM [User] WHERE Username = @username');
 
         const result = await pool.request()
-            .input('username', userName.trim()) 
+            .input('username', Username.trim()) // Trim any extra spaces
             .query('DELETE FROM [User] WHERE Username = @username');
 
         console.log('Query result:', result);
