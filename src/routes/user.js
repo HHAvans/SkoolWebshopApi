@@ -59,23 +59,99 @@ router.get('/basic', async (req, res) => {
             .input('status', status)
             .query('SELECT Username, Email, Role FROM [User] WHERE Status = @status');
 
-            if (result.recordset.length > 0) {
-                res.status(200).json({
-                    status: 200,
-                    message: "User data retrieved successfully",
-                    data: result.recordset
-                });
-            } else {
-                res.status(404).json({
-                    status: 404,
-                    message: "No users found with the given status"
-                });
-            }
-        } catch (error) {
-            console.error('Database query error:', error);
-            res.status(500).json({ error: 'Database Query Error' });
+        if (result.recordset.length > 0) {
+            res.status(200).json({
+                status: 200,
+                message: "User data retrieved successfully",
+                data: result.recordset
+            });
+        } else {
+            res.status(404).json({
+                status: 404,
+                message: "No users found with the given status"
+            });
         }
-    });
+    } catch (error) {
+        console.error('Database query error:', error);
+        res.status(500).json({ error: 'Database Query Error' });
+    }
+});
 
+//updating status in users
+
+router.post('/updateStatus', async (req, res) => {
+    console.log('POST /user/updateStatus');
+    console.log('Request body:', req.body);
+
+    try {
+        const { userName, status } = req.body;
+        if (!userName || !status) {
+            return res.status(400).json({ status: 400, message: 'Username and status are required' });
+        }
+
+        const pool = await poolPromise;
+        console.log('Executing query on database: UPDATE [User] SET Status = @status WHERE Username = @username');
+
+        const result = await pool.request()
+            .input('status', status)
+            .input('username', userName.trim())
+            .query('UPDATE [User] SET Status = @status WHERE Username = @username');
+
+        console.log('Query result:', result);
+
+        if (result.rowsAffected[0] > 0) {
+            res.status(200).json({
+                status: 200,
+                message: "User status updated successfully"
+            });
+        } else {
+            res.status(404).json({
+                status: 404,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        console.error('Database query error:', error);
+        res.status(500).json({ error: 'Database Query Error' });
+    }
+});
+
+//Delete user
+
+router.delete('/delete', async (req, res) => {
+    console.log('DELETE /user/delete');
+    console.log('Request body:', req.body);
+
+    try {
+        const { userName } = req.body;
+        if (!userName) {
+            return res.status(400).json({ status: 400, message: 'Username is required' });
+        }
+
+        const pool = await poolPromise;
+        console.log('Executing query on database: DELETE FROM [User] WHERE Username = @username');
+
+        const result = await pool.request()
+            .input('username', userName.trim()) 
+            .query('DELETE FROM [User] WHERE Username = @username');
+
+        console.log('Query result:', result);
+
+        if (result.rowsAffected[0] > 0) {
+            res.status(200).json({
+                status: 200,
+                message: "User deleted successfully"
+            });
+        } else {
+            res.status(404).json({
+                status: 404,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        console.error('Database query error:', error);
+        res.status(500).json({ error: 'Database Query Error' });
+    }
+});
 
 module.exports = router;
