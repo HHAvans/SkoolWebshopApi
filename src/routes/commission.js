@@ -40,12 +40,49 @@ router.get("/all", async (req, res) => {
 
   try {
     const pool = await poolPromise;
-    const query = "SELECT * FROM [Commission]";
+    const query = `
+      SELECT 
+        C.CommissionId,
+        C.ClientId,
+        C.CommissionName,
+        C.Address,
+        C.Date,
+        C.CommissionNotes,
+        W.WorkshopId,
+        W.WorkshopName,
+        U.Username AS TeacherName
+      FROM Commission C
+      LEFT JOIN CommissionWorkshop CW ON C.CommissionId = CW.CommissionId
+      LEFT JOIN Workshop W ON CW.WorkshopId = W.WorkshopId
+      LEFT JOIN CommissionWorkshopUser CWU ON CW.CommissionWorkshopId = CWU.CommissionWorkshopId
+      LEFT JOIN [User] U ON CWU.UserId = U.UserId
+      ORDER BY C.CommissionId;
+    `;
+
     console.log("EXECUTING QUERY ON DATABASE: " + query);
     const result = await pool.request().query(query);
+    const commissions = [];
+    result.recordset.forEach(row => {
+      if(!commissions[row.CommissionId]) {
+        commissions[row.CommissionId] = {
+          CommissionId: row.CommissionId,
+          ClientId: row.ClientId,
+          CommissionName: row.CommissionName,
+          Address: row.Address,
+          Date: row.Date,
+          CommissionNotes: row.CommissionNotes,
+          Workshops: []
+        };
+      }
+      commissions[row.CommissionId].Workshops.push({
+        workshopId: row.WorkshopId,
+        workshopName: row.WorkshopName,
+        assignedTeacher: row.TeacherName
+      })
+    })
     res.json({
       status: 200,
-      data: result.recordset,
+      data: Object.values(commissions),
       message: "Succesfully retrieved all commissions",
     });
   } catch (error) {
@@ -69,7 +106,7 @@ router.get("/:id", async (req, res) => {
     C.CommissionName AS CommissionName, C.Address AS CommissionAddress, C.CommissionNotes AS CommissionNotes,
     W.WorkshopName AS WorkshopName, W.Description AS WorkshopDescription, W.Category AS WorkshopCategory, 
     W.LinkToPicture AS WorkshopLinkToPicture, W.Requirements AS WorkshopRequirements,
-    CW.StartTime, CW.EndTime, CW.Location AS WorkshopAddress, CW.TargetGroup, CW.Level, CW.WorkshopNotes AS WorkshopNotes, 
+    CW.StartTime, CW.EndTime, CW.Location AS WorkshopAddress, CW.Level, CW.WorkshopNotes AS WorkshopNotes, 
     CW.NumberOfParticipants, CW.WorkshopId, CW.CommissionWorkshopId,
     CWU.UserId,
     U.Username, U.Email, U.SalaryPerHourInEuro
@@ -113,7 +150,6 @@ router.get("/:id", async (req, res) => {
           StartTime: row.StartTime,
           EndTime: row.EndTime,
           WorkshopAddress: row.WorkshopAddress,
-          TargetGroup: row.TargetGroup,
           Level: row.Level,
           WorkshopNotes: row.WorkshopNotes,
           NumberOfParticipants: row.NumberOfParticipants,
