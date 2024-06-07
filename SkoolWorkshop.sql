@@ -34,7 +34,9 @@ CREATE TABLE "User" (
 	UsesPublicTransit		BIT				NOT NULL,
 	HasCar					BIT				NOT NULL,
 	HasLicense				BIT				NOT NULL,
+	Status 					NVARCHAR(10)	NOT NULL   DEFAULT 'Afwachtend',		
 	
+	CONSTRAINT CK_StatusUser CHECK (Status = 'Toegewezen' OR Status = 'Afwachtend' OR Status = 'Geblokkeerd'),
 	CONSTRAINT CHK_Role CHECK (Role = 'ZZP' OR Role = 'Flex'),
 	CONSTRAINT CHK_Permission CHECK (Permission = 'Default' OR Permission = 'Moderator' OR Permission = 'Admin'),
 	CONSTRAINT CHK_RoleZzpHasBTWAndKVK CHECK (Role != 'ZZP' OR (BTWNumber IS NOT NULL AND KVKNumber IS NOT NULL))
@@ -67,7 +69,10 @@ CREATE TABLE "Commission" (
 	CommissionName NVARCHAR(100) NOT NULL,
 	Address NVARCHAR(100) NOT NULL,
 	Date DATE NOT NULL,
-	CommissionNotes NVARCHAR(1000) NOT NULL,
+	CommissionNotes NVARCHAR(1000),
+	AmountOfRounds INTEGER NOT NULL,
+	StartTimeDay TIME(7) NOT NULL,
+	EndTimeDay TIME(7) NOT NULL,
 
 	CONSTRAINT FK_Commission_Client FOREIGN KEY (ClientId) REFERENCES Client (ClientId)
 	ON DELETE NO ACTION
@@ -80,12 +85,12 @@ CREATE TABLE "CommissionWorkshop" (
 	WorkshopId INTEGER NOT NULL,
 	StartTime TIME NOT NULL,
 	EndTime TIME NOT NULL,
+	SelectedRound INTEGER NOT NULL,
 	MaxUsers INT NOT NULL,
 	NumberOfParticipants INTEGER NOT NULL,
-	Location NVARCHAR(100) NOT NULL,
-	Level NVARCHAR(10) NOT NULL,
-	TargetGroup NVARCHAR(10) NOT NULL,
-	WorkshopNotes NVARCHAR(1000) NOT NULL
+	Location NVARCHAR(100),
+	Level NVARCHAR(50),
+	WorkshopNotes NVARCHAR(1000)
 
 	CONSTRAINT FK_CommissionWorkshop_Commission FOREIGN KEY (CommissionId) REFERENCES Commission (CommissionId)
 	ON DELETE NO ACTION
@@ -127,10 +132,10 @@ CREATE TABLE "EmailTemplate" (
 ░░░╚═╝░░░╚═╝░░╚═╝╚══════╝░╚═════╝░╚══════╝╚═════╝░
 */ GO
 
-INSERT INTO "User" (Username, Birthdate, City, Address, Email, Password, PhoneNumber, PostalCode, BTWNumber, KVKNumber, BankId, Role, Permission, SalaryPerHourInEuro, UsesPublicTransit, HasCar, HasLicense) VALUES
-('Janine Doe', '1990-05-15', 'Rotterdam', 'Hoofdstraat 123', 'janine.doe@example.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2', '+31611111111', '3000AA', NULL, NULL, 'NL34RABO0123456789', 'Flex', 'Default', 50.00, 1, 0, 0),
-('John de Vries', '1985-11-30', 'Amsterdam', 'Grachtstraat 456', 'john.devries@example.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2', '+31622222222', '1011AB', '9876543', '1234567', 'NL44ABNA0123456789', 'ZZP', 'Moderator', 75.00, 0, 1, 1),
-('Clinten Pique', '1999-02-02', 'Breda', 'Lovensdijkstraat 61', 'info@skoolworkshop.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2' ,'+316000000', '4614RM', '5641421', '4542522', 'NL06241231231312', 'ZZP', 'Admin', 100, 0, 1, 1);
+INSERT INTO "User" (Username, Birthdate, City, Address, Email, Password, PhoneNumber, PostalCode, BTWNumber, KVKNumber, BankId, Role, Permission, SalaryPerHourInEuro, UsesPublicTransit, HasCar, HasLicense, Status) VALUES
+('Janine Doe', '1990-05-15', 'Rotterdam', 'Hoofdstraat 123', 'janine.doe@example.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2', '+31611111111', '3000AA', NULL, NULL, 'NL34RABO0123456789', 'Flex', 'Default', 50.00, 1, 0, 0, 'Toegewezen'),
+('John de Vries', '1985-11-30', 'Amsterdam', 'Grachtstraat 456', 'john.devries@example.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2', '+31622222222', '1011AB', '9876543', '1234567', 'NL44ABNA0123456789', 'ZZP', 'Moderator', 75.00, 0, 1, 1, 'Toegewezen'),
+('Clinten Pique', '1999-02-02', 'Breda', 'Lovensdijkstraat 61', 'info@skoolworkshop.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2' ,'+316000000', '4614RM', '5641421', '4542522', 'NL06241231231312', 'ZZP', 'Admin', 100, 0, 1, 1, 'Toegewezen');
 
 
 INSERT INTO Workshop (WorkshopName, Category, Requirements, Description, LinkToPicture) VALUES
@@ -146,15 +151,15 @@ INSERT INTO Client (ClientName, Organisation, TargetAudience, ContactPerson, Ema
 ('Wereldwijde Corp', 'Wereldwijde Corporatie', 'Werknemers', 'Michael Bruin', 'michael.bruin@wereldwijdecorp.com', '+31655556666', 'Zakelijk Plaza 78', 987654);
 
 
-INSERT INTO "Commission" (ClientId, CommissionName, Address, Date, CommissionNotes) VALUES
-((SELECT ClientId FROM Client WHERE ClientName = 'Technische Universiteit'), 'Programmeren Bootcamp', 'Technische Universiteit Campus', '2024-07-15', 'Een uitgebreide bootcamp over programmeren.'),
-((SELECT ClientId FROM Client WHERE ClientName = 'Wereldwijde Corp'), 'Teambuilding Workshop', 'Wereldwijde Corp Hoofdkantoor', '2024-08-20', 'Een workshop gericht op het verbeteren van de teamcohesie en samenwerking.');
+INSERT INTO "Commission" (ClientId, CommissionName, Address, Date, CommissionNotes, AmountOfRounds, StartTimeDay, EndTimeDay) VALUES
+((SELECT ClientId FROM Client WHERE ClientName = 'Technische Universiteit'), 'Programmeren Bootcamp', 'Technische Universiteit Campus', '2024-07-15', 'Een uitgebreide bootcamp over programmeren.', 1, '13:00', '17:00'),
+((SELECT ClientId FROM Client WHERE ClientName = 'Wereldwijde Corp'), 'Teambuilding Workshop', 'Wereldwijde Corp Hoofdkantoor', '2024-08-20', 'Een workshop gericht op het verbeteren van de teamcohesie en samenwerking.', 1, '13:00', '17:00');
 
 
-INSERT INTO "CommissionWorkshop" (CommissionId, WorkshopId, StartTime, EndTime, MaxUsers, NumberOfParticipants, Location, Level, TargetGroup, WorkshopNotes) VALUES
-((SELECT CommissionId FROM "Commission" WHERE CommissionName = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE WorkshopName = 'Python Programmeren'), '09:00', '17:00', 1, 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische python sessies.'),
-((SELECT CommissionId FROM "Commission" WHERE CommissionName = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE WorkshopName = 'Java Programmeren'), '09:00', '17:00', 1, 30, 'Technische Universiteit Campus', 'Gevorderd', 'B', 'Dagdagen bootcamp met praktische java sessies.'),
-((SELECT CommissionId FROM "Commission" WHERE CommissionName = 'Teambuilding Workshop'), (SELECT WorkshopId FROM Workshop WHERE WorkshopName = 'Openbaar Spreken'), '13:00', '15:00', 2, 25, 'Wereldwijde Corp Hoofdkantoor', 'Beginner', 'C', 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.');
+INSERT INTO "CommissionWorkshop" (CommissionId, WorkshopId, StartTime, EndTime, MaxUsers, NumberOfParticipants, Location, Level, WorkshopNotes, SelectedRound) VALUES
+((SELECT CommissionId FROM "Commission" WHERE CommissionName = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE WorkshopName = 'Python Programmeren'), '09:00', '17:00', 1, 30, 'Technische Universiteit Campus', 'Gevorderd', 'Dagdagen bootcamp met praktische python sessies.', 1),
+((SELECT CommissionId FROM "Commission" WHERE CommissionName = 'Programmeren Bootcamp'), (SELECT WorkshopId FROM Workshop WHERE WorkshopName = 'Java Programmeren'), '09:00', '17:00', 1, 30, 'Technische Universiteit Campus', 'Gevorderd', 'Dagdagen bootcamp met praktische java sessies.', 1),
+((SELECT CommissionId FROM "Commission" WHERE CommissionName = 'Teambuilding Workshop'), (SELECT WorkshopId FROM Workshop WHERE WorkshopName = 'Openbaar Spreken'), '13:00', '15:00', 2, 25, 'Wereldwijde Corp Hoofdkantoor', 'Beginner', 'Interactieve sessies voor openbaar spreken om communicatievaardigheden te verbeteren.', 1);
 
 
 INSERT INTO "CommissionWorkshopUser" (CommissionWorkshopId, UserId, Status) VALUES
@@ -328,7 +333,7 @@ GO
 */
 
 -- Get workshops in commissions with no user assigned to it
-SELECT CommissionWorkshopId, CommissionId, StartTime, EndTime, NumberOfParticipants, Location, Level, TargetGroup, WorkshopNotes, Workshop.WorkshopId, WorkshopName, Workshop.Category, Workshop.Requirements, Workshop.Description, Workshop.LinkToPicture
+SELECT CommissionWorkshopId, CommissionId, StartTime, EndTime, NumberOfParticipants, Location, Level,  WorkshopNotes, Workshop.WorkshopId, WorkshopName, Workshop.Category, Workshop.Requirements, Workshop.Description, Workshop.LinkToPicture
 FROM CommissionWorkshop t1
 INNER JOIN Workshop ON t1.WorkshopId = Workshop.WorkshopId
 WHERE NOT EXISTS (SELECT t2.CommissionWorkshopId, t2.Status FROM CommissionWorkshopUser t2 WHERE t1.CommissionWorkshopId = t2.CommissionWorkshopId AND t2.Status = 'Toegewezen')
