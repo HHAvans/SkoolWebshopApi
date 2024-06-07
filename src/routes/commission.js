@@ -69,7 +69,7 @@ router.get("/:id", async (req, res) => {
     C.CommissionName AS CommissionName, C.Address AS CommissionAddress, C.CommissionNotes AS CommissionNotes,
     W.WorkshopName AS WorkshopName, W.Description AS WorkshopDescription, W.Category AS WorkshopCategory, 
     W.LinkToPicture AS WorkshopLinkToPicture, W.Requirements AS WorkshopRequirements,
-    CW.StartTime, CW.EndTime, CW.Location AS WorkshopAddress, CW.TargetGroup, CW.Level, CW.WorkshopNotes AS WorkshopNotes, 
+    CW.StartTime, CW.EndTime, CW.Location AS WorkshopAddress, CW.Level, CW.WorkshopNotes AS WorkshopNotes, 
     CW.NumberOfParticipants, CW.WorkshopId, CW.CommissionWorkshopId,
     CWU.UserId,
     U.Username, U.Email, U.SalaryPerHourInEuro
@@ -113,7 +113,6 @@ router.get("/:id", async (req, res) => {
           StartTime: row.StartTime,
           EndTime: row.EndTime,
           WorkshopAddress: row.WorkshopAddress,
-          TargetGroup: row.TargetGroup,
           Level: row.Level,
           WorkshopNotes: row.WorkshopNotes,
           NumberOfParticipants: row.NumberOfParticipants,
