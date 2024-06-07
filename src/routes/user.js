@@ -84,17 +84,20 @@ router.post('/updateStatus', async (req, res) => {
     console.log('Request body:', req.body);
 
     try {
-        const { userName, status } = req.body;
-        if (!userName || !status) {
+        const { Username, status } = req.body;
+        if (!Username || !status) {
             return res.status(400).json({ status: 400, message: 'Username and status are required' });
         }
+
+        const trimmedUsername = Username.trim();
+        console.log(`Updating user ${trimmedUsername} to status ${status}`);
 
         const pool = await poolPromise;
         console.log('Executing query on database: UPDATE [User] SET Status = @status WHERE Username = @username');
 
         const result = await pool.request()
             .input('status', status)
-            .input('username', userName.trim())
+            .input('username', trimmedUsername) // Trim any extra spaces
             .query('UPDATE [User] SET Status = @status WHERE Username = @username');
 
         console.log('Query result:', result);
