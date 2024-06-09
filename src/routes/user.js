@@ -157,4 +157,30 @@ router.delete('/delete', async (req, res) => {
     }
 });
 
+// Get specific user
+router.get('/:id', async (req, res) => {
+    console.log('GET /user/:id');
+
+    try {
+        const pool = await poolPromise;
+        console.log('EXECUTING QUERY ON DATABASE: SELECT * FROM [User] WHERE UserId = ' + req.params.id)
+        const result = await pool.request().query('SELECT * FROM [User] WHERE UserId = ' + req.params.id);
+
+        // Remove IDs and passwords from the result set
+        const userWithoutIdAndPassword = result.recordset.map(user => {
+            const { UserId, Password, ...rest } = user;
+            return rest;
+        });
+
+        res.json({
+            status: 200,
+            message: "User retrieved",
+            data: userWithoutIdAndPassword
+        });
+    } catch (error) {
+        console.error('Database query error:', error);
+        res.status(500).json({ error: 'Database Query Error' });
+    }
+});
+
 module.exports = router;
