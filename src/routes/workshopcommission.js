@@ -144,8 +144,8 @@ router.post("/add", async (req, res) => {
       .input('Date', sql.DateTime, req.body.date)
       .input('CommissionNotes', sql.NVarChar(255), req.body.commissionnotes)
       .input('AmountOfRounds', sql.Int, req.body.amountofrounds)
-      .input('StartTimeDay', sql.DateTime,`1970-01-01 ${req.body.starttimeday}`)
-      .input('EndTimeDay', sql.DateTime,`1970-01-01 ${req.body.endtimeday}`)
+      .input('StartTimeDay', sql.DateTime, `1970-01-01 ${req.body.starttimeday}`)
+      .input('EndTimeDay', sql.DateTime, `1970-01-01 ${req.body.endtimeday}`)
       .query(insertCommissionQuery);
 
     const commissionId = commissionResult.recordset[0].CommissionId;
@@ -179,7 +179,7 @@ router.post("/add", async (req, res) => {
         .input('MaxUsers', sql.Int, workshop.maxusers)
         .input('NumberOfParticipants', sql.Int, workshop.numberofparticipents)
         .input('Level', sql.NVarChar(255), workshop.level)
-        .input('StartTime', sql.DateTime,`1970-01-01 ${workshop.starttime}`)
+        .input('StartTime', sql.DateTime, `1970-01-01 ${workshop.starttime}`)
         .input('EndTime', sql.DateTime, `1970-01-01 ${workshop.endtime}`)
         .input('Location', sql.NVarChar(255), workshop.location)
         .input('WorkshopNotes', sql.NVarChar(255), workshop.workshopnotes)
@@ -191,6 +191,48 @@ router.post("/add", async (req, res) => {
   } catch (error) {
     console.error("Database query error:", error);
     res.status(500).json({ error: "Database Query Error" });
+  }
+});
+
+// Get workshops in commissions where status = afwachtend
+
+router.get("/status/unassigned", async (req, res) => {
+  console.log("GET /workshopcommission/status/unassigned");
+
+  try {
+    const pool = await poolPromise;
+    const query = `
+      SELECT 
+        Workshop.WorkshopName,
+        Workshop.Category,
+        Client.ClientName,
+        CommissionWorkshop.Location,
+        [User].Username
+      FROM 
+        CommissionWorkshopUser
+      INNER JOIN 
+        CommissionWorkshop ON CommissionWorkshopUser.CommissionWorkshopId = CommissionWorkshop.CommissionWorkshopId
+      INNER JOIN 
+        Workshop ON CommissionWorkshop.WorkshopId = Workshop.WorkshopId
+      INNER JOIN 
+        Client ON CommissionWorkshop.CommissionId = Client.ClientId
+      INNER JOIN 
+        [User] ON CommissionWorkshopUser.UserId = [User].UserId
+      WHERE 
+        CommissionWorkshopUser.Status = 'Afwachtend'
+    `;
+
+    console.log("EXECUTING QUERY ON DATABASE: " + query);
+    const result = await pool.request().query(query);
+    res.json({
+      status: 200,
+      message: "Successfully retrieved all basic workshop information in commissions with no user",
+      data: result.recordset,
+    });
+  } catch (error) {
+    console.error("Database query error:", error);
+    console.error("Error details:", error.message, error.stack);
+    res.status(500).json({ error: "Database Query Error", details: error.message });
   }
 });
 
