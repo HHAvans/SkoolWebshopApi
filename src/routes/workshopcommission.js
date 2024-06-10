@@ -206,7 +206,8 @@ router.get("/status/unassigned", async (req, res) => {
         Workshop.WorkshopName,
         Workshop.Category,
         Client.ClientName,
-        CommissionWorkshop.Location
+        CommissionWorkshop.Location,
+        [User].Username
       FROM 
         CommissionWorkshopUser
       INNER JOIN 
@@ -215,6 +216,8 @@ router.get("/status/unassigned", async (req, res) => {
         Workshop ON CommissionWorkshop.WorkshopId = Workshop.WorkshopId
       INNER JOIN 
         Client ON CommissionWorkshop.CommissionId = Client.ClientId
+      INNER JOIN 
+        [User] ON CommissionWorkshopUser.UserId = [User].UserId
       WHERE 
         CommissionWorkshopUser.Status = 'Afwachtend'
     `;
