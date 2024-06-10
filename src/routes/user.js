@@ -166,10 +166,19 @@ router.get('/:id', async (req, res) => {
         console.log('EXECUTING QUERY ON DATABASE: SELECT * FROM [User] WHERE UserId = ' + req.params.id)
         const result = await pool.request().query('SELECT * FROM [User] WHERE UserId = ' + req.params.id);
 
-        // Remove IDs and passwords from the result set
+        // Remove IDs and passwords from the result set and format birthdate and boolean fields
         const userWithoutIdAndPassword = result.recordset.map(user => {
-            const { UserId, Password, ...rest } = user;
-            return rest;
+            const { UserId, Password, Birthdate, HasCar, HasLicense, ...rest } = user;
+
+            // Convert Birthdate to string in 'YYYY-MM-DD' format
+            const formattedBirthdate = Birthdate instanceof Date ? Birthdate.toISOString().split('T')[0] : Birthdate;
+
+            return {
+                ...rest,
+                Birthdate: formattedBirthdate,        // Format Birthdate
+                HasCar: HasCar ? "Ja" : "Nee",        // Format HasCar
+                HasLicense: HasLicense ? "Ja" : "Nee" // Format HasLicense
+            };
         });
 
         res.json({
@@ -182,5 +191,6 @@ router.get('/:id', async (req, res) => {
         res.status(500).json({ error: 'Database Query Error' });
     }
 });
+
 
 module.exports = router;
