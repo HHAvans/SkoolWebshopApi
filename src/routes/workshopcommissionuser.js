@@ -68,22 +68,22 @@ router.post('/updateStatus', async (req, res) => {
 
     try {
         const { userId, commissionWorkshopId } = req.body;
-        const status = 'Toegewezen'; 
+        const Status = 'Toegewezen'; 
 
         if (!userId || !commissionWorkshopId) {
             return res.status(400).json({ status: 400, message: 'userID and commissionWorkshopID are required' });
         }
 
-        console.log(`Updating user with ID ${userId} for commission ${commissionWorkshopId} to status ${status}`);
+        console.log(`Updating user with ID ${userId} for commission ${commissionWorkshopId} to Status ${Status}`);
 
         const pool = await poolPromise;
-        console.log('Executing query on database: UPDATE CommissionWorkshopUser SET Status = @status WHERE UserID = @userID AND CommissionWorkshopId = @commissionWorkshopId');
+        console.log('Executing query on database: UPDATE CommissionWorkshopUser SET Status = @Status WHERE UserId = @userId AND CommissionWorkshopId = @commissionWorkshopId');
 
         const result = await pool.request()
-            .input('status', status)
-            .input('userID', userId)
+            .input('Status', Status)
+            .input('userId', userId)
             .input('commissionWorkshopId', commissionWorkshopId)
-            .query('UPDATE CommissionWorkshopUser SET Status = @status WHERE UserID = @userID AND CommissionWorkshopId = @commissionWorkshopId');
+            .query('UPDATE CommissionWorkshopUser SET Status = @Status WHERE UserID = @userID AND CommissionWorkshopId = @commissionWorkshopId');
 
         console.log('Query result:', result);
 
