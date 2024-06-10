@@ -60,4 +60,50 @@ router.get('/all', async (req, res) => {
 // voor de update om de status of afgewezen of geaccepteerd te maken
 // 'UPDATE [WorkshopCommissionUser] SET Status = ${newStatus} WHERE UserId = ${userId} AND CommissionWorkshopId = ${commissionWorkshopId}'
 
+
+// route for updating status after accepting workshop admission
+router.post('/updateStatus', async (req, res) => {
+    console.log('POST /workshopcommissionuser/updateStatus');
+    console.log('Request body:', req.body);
+
+    try {
+        const { userId, commissionWorkshopId } = req.body;
+        const status = 'Toegewezen'; 
+
+        if (!userId || !commissionWorkshopId) {
+            return res.status(400).json({ status: 400, message: 'userID and commissionWorkshopID are required' });
+        }
+
+        console.log(`Updating user with ID ${userId} for commission ${commissionWorkshopId} to status ${status}`);
+
+        const pool = await poolPromise;
+        console.log('Executing query on database: UPDATE CommissionWorkshopUser SET Status = @status WHERE UserID = @userID AND CommissionWorkshopId = @commissionWorkshopId');
+
+        const result = await pool.request()
+            .input('status', status)
+            .input('userID', userId)
+            .input('commissionWorkshopId', commissionWorkshopId)
+            .query('UPDATE CommissionWorkshopUser SET Status = @status WHERE UserID = @userID AND CommissionWorkshopId = @commissionWorkshopId');
+
+        console.log('Query result:', result);
+
+        if (result.rowsAffected[0] > 0) {
+            res.status(200).json({
+                status: 200,
+                message: "User status updated successfully"
+            });
+        } else {
+            res.status(404).json({
+                status: 404,
+                message: "User or Commission not found"
+            });
+        }
+    } catch (error) {
+        console.error('Database query error:', error);
+        res.status(500).json({ error: 'Database Query Error' });
+    }
+});
+
+
+
 module.exports = router;
