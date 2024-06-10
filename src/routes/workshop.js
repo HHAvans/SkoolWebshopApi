@@ -12,7 +12,8 @@ const { sql, poolPromise } = require('../dao/sqldao.js');
     "name": "Graffiti",
     "category": "Outdoor",
     "requirements": "",
-    "description": "Workshop graffiti"
+    "description": "Workshop graffiti",
+    "linktopictrure": "https://upload.wikimedia.org/wikipedia/commons/8/8d/President_Barack_Obama.jpg"
 }
 
  */
@@ -25,10 +26,11 @@ router.post('/add', async (req, res) => {
     const category = body.category
     const requirements = body.requirements
     const description = body.description
+    const linktopicture = body.linktopicture
 
     try {
         const pool = await poolPromise;
-        querytodatabase = (`INSERT INTO [Workshop] VALUES ('${name}', '${category}', '${requirements}', '${description}')`)
+        querytodatabase = (`INSERT INTO [Workshop] VALUES ('${name}', '${category}', '${requirements}', '${description}', '${linktopicture}')`)
         console.log('EXECUTING QUERY ON DATABASE: ' + querytodatabase)
         const result = await pool.request().query(querytodatabase)
         res.json({

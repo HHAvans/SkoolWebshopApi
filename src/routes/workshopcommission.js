@@ -79,12 +79,14 @@ router.get("/:id", async (req, res) => {
  *  "address": "",
  *  "date": "",
  *  "commissionnotes": "",
+ *  "amountofrounds": 1,
+ *  "starttimeday": "9:00",
+ *  "endtimeday": "15:00",
  *  "workshops": [
  *    {
  *      "workshopname": "", (Must be existing workshop)
  *      "maxusers": "",
  *      "numberofparticipents": "",
- *      "targetgroup": "",
  *      "level": "",
  *      "starttime": "",
  *      "endtime": "",
@@ -95,7 +97,6 @@ router.get("/:id", async (req, res) => {
  *      "workshopname": "",
  *      "maxusers": "",
  *      "numberofparticipents": "",
- *      "targetgroup": "",
  *      "level": "",
  *      "starttime": "",
  *      "endtime": "",
@@ -129,8 +130,8 @@ router.post("/add", async (req, res) => {
 
     // Insert into Commission table
     const insertCommissionQuery = `
-      INSERT INTO Commission (ClientId, CommissionName, Address, Date, CommissionNotes) 
-      VALUES (@ClientId, @CommissionName, @Address, @Date, @CommissionNotes);
+      INSERT INTO Commission (ClientId, CommissionName, Address, Date, CommissionNotes, AmountOfRounds, StartTimeDay, EndTimeDay) 
+      VALUES (@ClientId, @CommissionName, @Address, @Date, @CommissionNotes, @AmountOfRounds, @StartTimeDay, @EndTimeDay);
       SELECT SCOPE_IDENTITY() AS CommissionId;
     `;
     console.log("EXECUTING QUERY ON DATABASE: " + insertCommissionQuery);
@@ -142,6 +143,9 @@ router.post("/add", async (req, res) => {
       .input('Address', sql.NVarChar(255), req.body.address)
       .input('Date', sql.DateTime, req.body.date)
       .input('CommissionNotes', sql.NVarChar(255), req.body.commissionnotes)
+      .input('AmountOfRounds', sql.Int, req.body.amountofrounds)
+      .input('StartTimeDay', sql.DateTime,`1970-01-01 ${req.body.starttimeday}`)
+      .input('EndTimeDay', sql.DateTime,`1970-01-01 ${req.body.endtimeday}`)
       .query(insertCommissionQuery);
 
     const commissionId = commissionResult.recordset[0].CommissionId;
@@ -164,8 +168,8 @@ router.post("/add", async (req, res) => {
       const workshopId = workshopIdResult.recordset[0].WorkshopId;
 
       const workshopQuery = `
-        INSERT INTO CommissionWorkshop (CommissionId, WorkshopId, MaxUsers, NumberOfParticipants, TargetGroup, Level, StartTime, EndTime, Location, WorkshopNotes) 
-        VALUES (@CommissionId, @WorkshopId, @MaxUsers, @NumberOfParticipants, @TargetGroup, @Level, @StartTime, @EndTime, @Location, @WorkshopNotes);
+        INSERT INTO CommissionWorkshop (CommissionId, WorkshopId, MaxUsers, NumberOfParticipants, Level, StartTime, EndTime, Location, WorkshopNotes, SelectedRound)
+        VALUES (@CommissionId, @WorkshopId, @MaxUsers, @NumberOfParticipants, @Level, @StartTime, @EndTime, @Location, @WorkshopNotes, @SelectedRound);
       `;
       console.log("EXECUTING QUERY ON DATABASE: " + workshopQuery);
 
@@ -174,12 +178,12 @@ router.post("/add", async (req, res) => {
         .input('WorkshopId', sql.Int, workshopId)
         .input('MaxUsers', sql.Int, workshop.maxusers)
         .input('NumberOfParticipants', sql.Int, workshop.numberofparticipents)
-        .input('TargetGroup', sql.NVarChar(255), workshop.targetgroup)
         .input('Level', sql.NVarChar(255), workshop.level)
         .input('StartTime', sql.DateTime,`1970-01-01 ${workshop.starttime}`)
         .input('EndTime', sql.DateTime, `1970-01-01 ${workshop.endtime}`)
         .input('Location', sql.NVarChar(255), workshop.location)
         .input('WorkshopNotes', sql.NVarChar(255), workshop.workshopnotes)
+        .input('SelectedRound', sql.Int, workshop.selectedround)
         .query(workshopQuery);
     }
 

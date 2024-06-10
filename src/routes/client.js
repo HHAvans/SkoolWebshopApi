@@ -97,7 +97,7 @@ router.get("/allnames", async (req, res) => {
 });
 
 router.post("/address", async (req, res) => {
-    console.log("GET /address");
+    console.log("POST /address");
 
     try {
         const pool = await poolPromise;

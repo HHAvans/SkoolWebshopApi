@@ -13,7 +13,7 @@ router.get("/all/nouser", async (req, res) => {
     const query = `
     SELECT 
       CommissionWorkshopId, CommissionId, StartTime, EndTime, NumberOfParticipants, Location, Level, 
-      TargetGroup, WorkshopNotes, Workshop.WorkshopId, WorkshopName, Workshop.Category, Workshop.Requirements, 
+      WorkshopNotes, Workshop.WorkshopId, WorkshopName, Workshop.Category, Workshop.Requirements, 
       Workshop.Description, Workshop.LinkToPicture
     FROM CommissionWorkshop t1
     INNER JOIN Workshop ON t1.WorkshopId = Workshop.WorkshopId
