@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS "CommissionWorkshop";
 DROP TABLE IF EXISTS "Workshop";
 DROP TABLE IF EXISTS "Commission";
 DROP TABLE IF EXISTS "Client";
+DROP TABLE IF EXISTS "UserWorkshop"; 
 DROP TABLE IF EXISTS "User";
 
 
@@ -25,6 +26,8 @@ CREATE TABLE "User" (
 	Password				NVARCHAR(300)	NOT NULL,
 	PhoneNumber				NVARCHAR(20)	NOT NULL	UNIQUE,
 	PostalCode				NVARCHAR(11)	NOT NULL,
+	Country					NVARCHAR(20)	NOT NULL,
+	Language				NVARCHAR(10)	NOT NULL,
 	BTWNumber				INTEGER	,
 	KVKNumber				INTEGER	,
 	BankId					NVARCHAR(34)	NOT NULL,
@@ -34,8 +37,9 @@ CREATE TABLE "User" (
 	UsesPublicTransit		BIT				NOT NULL,
 	HasCar					BIT				NOT NULL,
 	HasLicense				BIT				NOT NULL,
-	Status 					NVARCHAR(10)	NOT NULL   DEFAULT 'Afwachtend',		
+	Status 					NVARCHAR(10)	NOT NULL   DEFAULT 'Afwachtend',	
 	
+	CONSTRAINT CK_Language CHECK (Language = 'Nederlands' OR Language = 'English' OR Language = 'Both'),
 	CONSTRAINT CK_StatusUser CHECK (Status = 'Toegewezen' OR Status = 'Afwachtend' OR Status = 'Geblokkeerd'),
 	CONSTRAINT CHK_Role CHECK (Role = 'ZZP' OR Role = 'Flex'),
 	CONSTRAINT CHK_Permission CHECK (Permission = 'Default' OR Permission = 'Moderator' OR Permission = 'Admin'),
@@ -44,11 +48,18 @@ CREATE TABLE "User" (
 
 CREATE TABLE Workshop (
 	WorkshopId				INTEGER			PRIMARY KEY	IDENTITY(1,1),
-	WorkshopName					NVARCHAR(64)	NOT NULL	UNIQUE,
+	WorkshopName			NVARCHAR(64)	NOT NULL	UNIQUE,
 	Category				NVARCHAR(64)	NOT NULL,
 	Requirements			NVARCHAR(4000)	NOT NULL,
 	Description				NVARCHAR(4000)	NOT NULL,
 	LinkToPicture			NVARCHAR(200)	NOT NULL
+);
+
+CREATE TABLE UserWorkshop (
+	UserId					INTEGER			NOT NULL,
+	WorkshopId				INTEGER			NOT NULL
+
+	PRIMARY KEY (UserId, WorkshopId)
 );
 
 CREATE TABLE Client (
@@ -132,10 +143,10 @@ CREATE TABLE "EmailTemplate" (
 ░░░╚═╝░░░╚═╝░░╚═╝╚══════╝░╚═════╝░╚══════╝╚═════╝░
 */ GO
 
-INSERT INTO "User" (Username, Birthdate, City, Address, Email, Password, PhoneNumber, PostalCode, BTWNumber, KVKNumber, BankId, Role, Permission, SalaryPerHourInEuro, UsesPublicTransit, HasCar, HasLicense, Status) VALUES
-('Janine Doe', '1990-05-15', 'Rotterdam', 'Hoofdstraat 123', 'janine.doe@example.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2', '+31611111111', '3000AA', NULL, NULL, 'NL34RABO0123456789', 'Flex', 'Default', 50.00, 1, 0, 0, 'Toegewezen'),
-('John de Vries', '1985-11-30', 'Amsterdam', 'Grachtstraat 456', 'john.devries@example.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2', '+31622222222', '1011AB', '9876543', '1234567', 'NL44ABNA0123456789', 'ZZP', 'Moderator', 75.00, 0, 1, 1, 'Toegewezen'),
-('Clinten Pique', '1999-02-02', 'Breda', 'Lovensdijkstraat 61', 'info@skoolworkshop.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2' ,'+316000000', '4614RM', '5641421', '4542522', 'NL06241231231312', 'ZZP', 'Admin', 100, 0, 1, 1, 'Toegewezen');
+INSERT INTO "User" (Username, Birthdate, City, Address, Email, Password, PhoneNumber, PostalCode, Country, Language, BTWNumber, KVKNumber, BankId, Role, Permission, SalaryPerHourInEuro, UsesPublicTransit, HasCar, HasLicense, Status) VALUES
+('Janine Doe', '1990-05-15', 'Rotterdam', 'Hoofdstraat 123', 'janine.doe@example.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2', '+31611111111', '3000AA', 'Nederland', 'Nederlands', NULL, NULL, 'NL34RABO0123456789', 'Flex', 'Default', 50.00, 1, 0, 0, 'Toegewezen'),
+('John de Vries', '1985-11-30', 'Amsterdam', 'Grachtstraat 456', 'john.devries@example.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2', '+31622222222', '1011AB', 'Nederland', 'Nederlands', '9876543', '1234567', 'NL44ABNA0123456789', 'ZZP', 'Moderator', 75.00, 0, 1, 1, 'Toegewezen'),
+('Clinten Pique', '1999-02-02', 'Breda', 'Lovensdijkstraat 61', 'info@skoolworkshop.com', '$2a$10$gZuXV7vwJTC6v5cVkLmDJe7hV44wUTvTu3VpAjWiCZY44wS2CKNB2' ,'+316000000', '4614RM', 'Nederland', 'Nederlands', '5641421', '4542522', 'NL06241231231312', 'ZZP', 'Admin', 100, 0, 1, 1, 'Toegewezen');
 
 
 INSERT INTO Workshop (WorkshopName, Category, Requirements, Description, LinkToPicture) VALUES
