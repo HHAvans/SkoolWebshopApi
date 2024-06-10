@@ -192,5 +192,58 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+//update user information
+router.put('/:id', async (req, res) => {
+    console.log('PUT /user/:id');
+
+    const userId = req.params.id;
+    const email = req.body.email;
+    const phoneNumber = req.body.phoneNumber;
+    const address = req.body.address;
+    const postalCode  =req.body.postalCode;
+    const country = req.body.country;
+    const language = req.body.language;
+    const BTWNumber = req.body.BTWNumber;
+    const KVKNumber = req.body.KVKNumber;
+    const bankId = req.body.bankId;
+    const publicTransit = req.body.publicTransit;
+    const hasCar = req.body.hasCar;
+    const hasLicense = req.body.hasLicense
+
+
+    console.log(userId);
+
+    try {
+        const pool = await poolPromise;
+        const query = `UPDATE User
+        SET 
+            Email = '${email}',
+            PhoneNumber = '${phoneNumber}',
+            Address = '${address}',
+            PostalCode = '${postalCode}',
+            Country = '${country}',
+            Language = '${language}',
+            BTWNumber = '${BTWNumber}',
+            KVKNumber = '${KVKNumber}',
+            BankId = '${bankId}',
+            UsesPublicTransit = ${publicTransit},
+            HasCar = ${hasCar},
+            HasLicense = ${hasLicense}
+        WHERE 
+        [UserId] = ${userId}`;
+        console.log('EXECUTING QUERY ON DATABASE:', query);
+        const result = await pool.request.query(query);
+        res.json({
+            status: 200,
+            message: "User updated",
+            data: result
+        });
+
+    } catch (error) {
+        console.error('database query error:', error);
+        res.status(500).json({ error : 'Database Query Error'});
+    }
+})
+
 
 module.exports = router;
