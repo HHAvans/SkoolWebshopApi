@@ -46,7 +46,7 @@ router.get('/all', async (req, res) => {
     }
 });
 
-// fetching username, email and role 
+// fetching username, email, role and id 
 
 router.get('/basic', async (req, res) => {
     console.log('GET /user/basic');
@@ -54,11 +54,11 @@ router.get('/basic', async (req, res) => {
     try {
         const pool = await poolPromise;
         const status = 'Afwachtend';
-        console.log('EXECUTING QUERY ON DATABASE: SELECT Username, Email, Role FROM [User] WHERE Status = @status');
+        console.log('EXECUTING QUERY ON DATABASE: SELECT Username, Email, Role, UserId FROM [User] WHERE Status = @status');
 
         const result = await pool.request()
             .input('status', status)
-            .query('SELECT Username, Email, Role FROM [User] WHERE Status = @status');
+            .query('SELECT Username, Email, Role, UserId FROM [User] WHERE Status = @status');
 
         if (result.recordset.length > 0) {
             res.status(200).json({
