@@ -29,15 +29,16 @@ router.get('/all', async (req, res) => {
         const result = await pool.request().query('SELECT * FROM [User]');
 
         // Remove IDs and passwords from the result set
-        const usersWithoutIdAndPassword = result.recordset.map(user => {
-            const { UserId, Password, ...rest } = user;
-            return rest;
-        });
+        // const usersWithoutIdAndPassword = result.recordset.map(user => {
+        //     const { UserId, Password, ...rest } = user;
+        //     return rest;
+        // });
 
         res.json({
             status: 200,
             message: "User retrieved",
-            data: usersWithoutIdAndPassword
+            data: result
+            // data: usersWithoutIdAndPassword
         });
     } catch (error) {
         console.error('Database query error:', error);
