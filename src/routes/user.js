@@ -33,11 +33,12 @@ router.get('/all', async (req, res) => {
         //     const { UserId, Password, ...rest } = user;
         //     return rest;
         // });
+        const users = result.recordset;
 
         res.json({
             status: 200,
             message: "User retrieved",
-            data: result
+            data: users
             // data: usersWithoutIdAndPassword
         });
     } catch (error) {
