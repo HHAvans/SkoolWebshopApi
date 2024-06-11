@@ -66,14 +66,19 @@ router.get('/basic', async (req, res) => {
                 data: result.recordset
             });
         } else {
-            res.status(404).json({
-                status: 404,
-                message: "No users found with the given status"
+            res.status(204).json({
+                status: 204,
+                message: "No users found with the given status",
+                data: {}
             });
         }
     } catch (error) {
         console.error('Database query error:', error);
-        res.status(500).json({ error: 'Database Query Error' });
+        res.status(500).json({
+            status: 500,
+            message: 'Database Query Error',
+            data: {}
+        });
     }
 });
 
