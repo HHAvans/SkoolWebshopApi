@@ -66,8 +66,8 @@ router.get('/basic', async (req, res) => {
                 data: result.recordset
             });
         } else {
-            res.status(204).json({
-                status: 204,
+            res.status(200).json({
+                status: 200,
                 message: "No users found with the given status",
                 data: {}
             });
