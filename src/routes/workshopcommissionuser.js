@@ -128,7 +128,7 @@ router.delete('/delete', async (req, res) => {
             .query('DELETE FROM CommissionWorkshopUser WHERE UserId = @userId AND CommissionWorkshopId = @commissionWorkshopId');
 
         console.log('Query result:', result);
-        consolele.log('userId, commissionWorkshopId:', userId, commissionWorkshopId)
+        console.log('userId, commissionWorkshopId:', userId, commissionWorkshopId)
 
         if (result.rowsAffected[0] > 0) {
             res.status(200).json({
