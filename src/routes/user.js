@@ -47,7 +47,7 @@ router.get('/all', async (req, res) => {
     }
 });
 
-// fetching username, email, role and id 
+// fetching username, email, role and id.
 
 router.get('/basic', async (req, res) => {
     console.log('GET /user/basic');
