@@ -29,15 +29,16 @@ router.get('/all', async (req, res) => {
         const result = await pool.request().query('SELECT * FROM [User]');
 
         // Remove IDs and passwords from the result set
-        const usersWithoutIdAndPassword = result.recordset.map(user => {
-            const { UserId, Password, ...rest } = user;
-            return rest;
-        });
+        // const usersWithoutIdAndPassword = result.recordset.map(user => {
+        //     const { UserId, Password, ...rest } = user;
+        //     return rest;
+        // });
 
         res.json({
             status: 200,
             message: "User retrieved",
-            data: usersWithoutIdAndPassword
+            data: result
+            // data: usersWithoutIdAndPassword
         });
     } catch (error) {
         console.error('Database query error:', error);
@@ -66,14 +67,19 @@ router.get('/basic', async (req, res) => {
                 data: result.recordset
             });
         } else {
-            res.status(404).json({
-                status: 404,
-                message: "No users found with the given status"
+            res.status(200).json({
+                status: 200,
+                message: "No users found with the given status",
+                data: {}
             });
         }
     } catch (error) {
         console.error('Database query error:', error);
-        res.status(500).json({ error: 'Database Query Error' });
+        res.status(500).json({
+            status: 500,
+            message: 'Database Query Error',
+            data: {}
+        });
     }
 });
 
