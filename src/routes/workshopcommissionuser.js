@@ -104,6 +104,49 @@ router.post('/updateStatus', async (req, res) => {
     }
 });
 
+// route for deleting admission after denying the request
+router.delete('/delete', async (req, res) => {
+    console.log('DELETE /workshopcommissionuser/delete');
+    console.log('Request body:', req.body);
+
+    try {
+        const { userId, commissionWorkshopId } = req.body;
+       
+
+        if (!userId || !commissionWorkshopId) {
+            return res.status(400).json({ status: 400, message: 'userID and commissionWorkshopID are required' });
+        }
+
+        console.log(`Deleting submission User ID ${userId} for commission ${commissionWorkshopId}`);
+
+        const pool = await poolPromise;
+        console.log('Executing query on database: DELETE FROM CommissionWorkshopUser WHERE UserId = @userId AND CommissionWorkshopId = @commissionWorkshopId');
+
+        const result = await pool.request()
+            .input('userId', userId)
+            .input('commissionWorkshopId', commissionWorkshopId)
+            .query('DELETE FROM CommissionWorkshopUser WHERE UserId = @userId AND CommissionWorkshopId = @commissionWorkshopId');
+
+        console.log('Query result:', result);
+        console.log('userId, commissionWorkshopId:', userId, commissionWorkshopId)
+
+        if (result.rowsAffected[0] > 0) {
+            res.status(200).json({
+                status: 200,
+                message: "Admission deleted successfully"
+            });
+        } else {
+            res.status(404).json({
+                status: 404,
+                message: "User or Commission not found"
+            });
+        }
+    } catch (error) {
+        console.error('Database query error:', error);
+        res.status(500).json({ error: 'Database Query Error' });
+    }
+});
+
 
 
 module.exports = router;
