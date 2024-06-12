@@ -61,7 +61,6 @@ router.post("/login", async (req, res) => {
         {
           id: user.UserId,
           username: user.Username,
-          userRole: user.Permission, // Include user role in the token payload
         },
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
@@ -69,6 +68,7 @@ router.post("/login", async (req, res) => {
       return res.status(200).json({
         status: 200,
         message: "Login successful",
+        // Also give permissions to front-end to determine what to show
         data: {
           userRole: user.Permission,
           token,
