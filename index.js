@@ -28,9 +28,11 @@ const commissionRoutes = require("./src/routes/commission.js");
 const emailRoutes = require("./src/routes/email.js");
 const workshopCommissionRoutes = require("./src/routes/workshopcommission.js");
 const optionsRoutes = require("./src/routes/options.js");
+const validateTokenRoutes = require("./src/routes/validateToken.js");
 const workshopCommissionUserRoutes = require("./src/routes/workshopcommissionuser.js");
 
 app.use("/user", userRoutes);
+app.use("/auth", validateTokenRoutes);
 app.use("/workshop", workshopRoutes);
 app.use("/auth", authenticationRoutes);
 app.use("/client", customerRoutes);
