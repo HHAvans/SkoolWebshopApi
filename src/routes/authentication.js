@@ -81,20 +81,4 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Route to get the token and user role
-router.get("/get-token", (req, res) => {
-  // Extract the token from the authorization header
-  const token = req.headers.authorization;
-
-  // Extract the user role from the token payload
-  const decodedToken = jwt.decode(token);
-  const userRole = decodedToken.userRole;
-
-  // Send back the token and user role
-  res.status(200).json({
-    token,
-    userRole,
-  });
-});
-
 module.exports = router;

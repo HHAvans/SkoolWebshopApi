@@ -33,7 +33,6 @@ const workshopCommissionUserRoutes = require("./src/routes/workshopcommissionuse
 app.use("/user", userRoutes);
 app.use("/workshop", workshopRoutes);
 app.use("/auth", authenticationRoutes);
-app.use("/authToken", authenticationRoutes);
 app.use("/client", customerRoutes);
 app.use("/commission", commissionRoutes);
 app.use("/commission/:id", commissionRoutes);
