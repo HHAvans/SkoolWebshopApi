@@ -1,8 +1,11 @@
 const express = require("express");
-const { sql, poolPromise } = require("./src/dao/sqldao.js");
+
 const cors = require("cors");
 const app = express();
 const path = require("path");
+
+require('./src/services/scheduler'); 
+
 
 const corsOptions = {
   origin: "*", // Allows all origins
