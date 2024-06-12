@@ -5,31 +5,28 @@ const { sql, poolPromise } = require('../dao/sqldao');
 // user signs up for a workshop in an assignment
 // the status gets changed to pending - "Afwachtend"
 
-// bekijk de id's -- moeten er dus al zijn en erin gezet worden.
 router.post('/add', async (req, res) => {
     console.log('POST /add');
+    const body = req.body;
 
     // Retrieve values from the request body
-    const commissionWorkshopId = 2//req.body.commissionWorkshopId; //!!!
-    const userId = 2// req.body.userId; //!!!
-    const status = 'Afwachtend'; // Hardcoded as the default status //!!!
+    const commissionWorkshopId = body.CommissionWorkshopId
+    const userId = body.UserId
+    const status = body.Status; 
 
     console.log(commissionWorkshopId, userId, status);
 
     try {
         const pool = await poolPromise;
-        const query = 'INSERT INTO [CommissionWorkshopUser] (CommissionWorkshopId, UserId, Status) VALUES (@commissionWorkshopId, @userId, @status)'; //!!!
+        const query = `INSERT INTO CommissionWorkshopUser 
+        VALUES (${commissionWorkshopId}, ${userId}, '${status}')`
 
         console.log('EXECUTING QUERY ON DATABASE: ' + query);
-        await pool.request() //!!!
-            .input('commissionWorkshopId', sql.Int, commissionWorkshopId) //!!!
-            .input('userId', sql.Int, userId) //!!!
-            .input('status', sql.VarChar, status) //!!!
-            .query(query);
+        await pool.request().query(query);
 
         res.json({
             status: 200,
-            message: 'Successfully added the commissionWorkshopId, userId, and status' //!!!
+            message: 'Successfully signed up for workshop' 
         });
     } catch (error) {
         console.error('Database Query Error: ', error);
