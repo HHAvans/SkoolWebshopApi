@@ -18,11 +18,22 @@ router.post('/add', async (req, res) => {
 
     try {
         const pool = await poolPromise;
-        const query = `INSERT INTO CommissionWorkshopUser 
+        const checkQuery = `SELECT * FROM CommissionWorkshopUser WHERE CommissionWorkshopId = ${commissionWorkshopId} AND UserId = ${userId} AND Status = '${status}'` ;
+        const checkResult = await pool.request().query(checkQuery);
+        const count = checkResult.recordset.length;
+        console.log(`recordcount: ${count}`);
+        if (count > 0){
+            const deleteQuery = `DELETE FROM CommissionWorkshopUser 
+            WHERE CommissionWorkshopId = ${commissionWorkshopId} 
+            AND UserId = ${userId} AND Status = 'Afwachtend'`
+            await pool.request().query(deleteQuery);
+            console.log('existing record deleted');
+        }
+        const insertQuery = `INSERT INTO CommissionWorkshopUser 
         VALUES (${commissionWorkshopId}, ${userId}, '${status}')`
 
-        console.log('EXECUTING QUERY ON DATABASE: ' + query);
-        await pool.request().query(query);
+        console.log('EXECUTING QUERY ON DATABASE: ' + insertQuery);
+        await pool.request().query(insertQuery);
 
         res.json({
             status: 200,
