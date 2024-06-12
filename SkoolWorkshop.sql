@@ -123,9 +123,10 @@ CREATE TABLE "CommissionWorkshop" (
 CREATE TABLE "CommissionWorkshopUser" (
 	CommissionWorkshopId INTEGER NOT NULL,
 	UserId INTEGER NOT NULL,
-	Status NVARCHAR(10) NOT NULL
+	Status NVARCHAR(10) NOT NULL,
 
-	CONSTRAINT CK_Status CHECK (Status = 'Toegewezen' OR Status = 'Afwachtend' OR Status = 'Afgekeurd')
+	PRIMARY KEY (CommissionWorkshopId, UserId),
+	CONSTRAINT CK_Status CHECK (Status = 'Toegewezen' OR Status = 'Afwachtend' OR Status = 'Afgekeurd'),
 
 	CONSTRAINT FK_CommissionWorkshopUser_CommissionWorkshop FOREIGN KEY (CommissionWorkshopId) REFERENCES CommissionWorkshop (CommissionWorkshopId)
 	ON DELETE NO ACTION
