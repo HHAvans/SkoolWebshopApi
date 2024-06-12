@@ -61,6 +61,7 @@ router.post("/login", async (req, res) => {
         {
           id: user.UserId,
           username: user.Username,
+          userRole: user.Permission, // Include user role in the token payload
         },
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
@@ -68,16 +69,32 @@ router.post("/login", async (req, res) => {
       return res.status(200).json({
         status: 200,
         message: "Login successful",
-        // Also give permissions to front-end to determine what to show
-        data: { 
-            userRole: user.Permission, 
-            token },
+        data: {
+          userRole: user.Permission,
+          token,
+        },
       });
     }
   } catch (error) {
     console.error("Database query error:", error);
     return res.status(500).json({ error: "Database Query Error" });
   }
+});
+
+// Route to get the token and user role
+router.get("/get-token", (req, res) => {
+  // Extract the token from the authorization header
+  const token = req.headers.authorization;
+
+  // Extract the user role from the token payload
+  const decodedToken = jwt.decode(token);
+  const userRole = decodedToken.userRole;
+
+  // Send back the token and user role
+  res.status(200).json({
+    token,
+    userRole,
+  });
 });
 
 module.exports = router;
