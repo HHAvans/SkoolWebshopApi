@@ -276,20 +276,20 @@ router.put('/changeRole', async (req, res) => {
     console.log('Req body:', req.body);
 
     try {
-        const { Username, role, salary } = req.body;
-        if (!Username || !role || !salary) {
+        const { Username, Role, SalaryPerHourInEuro } = req.body;
+        if (!Username || !Role || !SalaryPerHourInEuro) {
             return res.status(400).json({ status: 400, message: 'Username, role and salary are required' });
         }
 
         const trimmedUsername = Username.trim();
-        console.log(`Updating user ${trimmedUsername} to role ${role} and salary ${salary}`);
+        console.log(`Updating user ${trimmedUsername} to role ${Role} and salary ${SalaryPerHourInEuro}`);
 
         const pool = await poolPromise;
         console.log('Executing query on database: UPDATE [User] SET Role = @role, SalaryPerHourInEuro = @salary WHERE Username = @username');
 
         const result = await pool.request()
-            .input('role', role)
-            .input('salary', salary)
+            .input('role', Role)
+            .input('salary', SalaryPerHourInEuro)
             .input('username', trimmedUsername) // Trim any extra spaces
             .query('UPDATE [User] SET Role = @role, SalaryPerHourInEuro = @salary WHERE Username = @username');
 
