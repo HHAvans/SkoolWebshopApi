@@ -204,42 +204,61 @@ router.put('/:id', async (req, res) => {
     console.log('PUT /user/:id');
 
     const userId = req.params.id;
+    const username = req.body.username;
     const email = req.body.email;
     const phoneNumber = req.body.phoneNumber;
     const address = req.body.address;
     const postalCode  =req.body.postalCode;
     const country = req.body.country;
     const language = req.body.language;
-    const BTWNumber = req.body.BTWNumber;
-    const KVKNumber = req.body.KVKNumber;
+
+    let BTWNumber
+    if (req.body.BTWNumber === null) {
+        BTWNumber = 'NULL';
+    } else {
+        BTWNumber = req.body.BTWNumber;
+    }
+    let KVKNumber
+    console.log(req.body.KVKNumber)
+    if (req.body.KVKNumber === null) {
+        KVKNumber = 'NULL';
+    } else {
+        KVKNumber = req.body.KVKNumber;
+    }
+
     const bankId = req.body.bankId;
-    const publicTransit = req.body.publicTransit;
+    const role = req.body.role;
+    const publicTransit = req.body.usesPublicTransit;
     const hasCar = req.body.hasCar;
-    const hasLicense = req.body.hasLicense
+    const hasLicense = req.body.hasLicense;
+    const status = req.body.status;
 
 
     console.log(userId);
 
     try {
         const pool = await poolPromise;
-        const query = `UPDATE User
+        const query = `UPDATE "User"
         SET 
+            UserName = '${username}',
             Email = '${email}',
             PhoneNumber = '${phoneNumber}',
             Address = '${address}',
             PostalCode = '${postalCode}',
             Country = '${country}',
             Language = '${language}',
-            BTWNumber = '${BTWNumber}',
-            KVKNumber = '${KVKNumber}',
+            BTWNumber = ${BTWNumber},
+            KVKNumber = ${KVKNumber},
             BankId = '${bankId}',
-            UsesPublicTransit = ${publicTransit},
-            HasCar = ${hasCar},
-            HasLicense = ${hasLicense}
+            role = '${role}',
+            UsesPublicTransit = '${publicTransit}',
+            HasCar = '${hasCar}',
+            HasLicense = '${hasLicense}',
+            Status = '${status}' 
         WHERE 
         [UserId] = ${userId}`;
         console.log('EXECUTING QUERY ON DATABASE:', query);
-        const result = await pool.request.query(query);
+        const result = await pool.request().query(query);
         res.json({
             status: 200,
             message: "User updated",

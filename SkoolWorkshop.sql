@@ -37,7 +37,7 @@ CREATE TABLE "User" (
 	UsesPublicTransit		BIT				NOT NULL,
 	HasCar					BIT				NOT NULL,
 	HasLicense				BIT				NOT NULL,
-	Status 					NVARCHAR(10)	NOT NULL   DEFAULT 'Afwachtend',	
+	Status 					NVARCHAR(11)	NOT NULL   DEFAULT 'Afwachtend',	
 	
 	CONSTRAINT CK_Language CHECK (Language = 'Nederlands' OR Language = 'English' OR Language = 'Both'),
 	CONSTRAINT CK_StatusUser CHECK (Status = 'Toegewezen' OR Status = 'Afwachtend' OR Status = 'Geblokkeerd'),
