@@ -22,7 +22,11 @@ router.get("/validate-token", (req, res) => {
     }
 
     // Token is valid, return success response
-    return res.status(200).json({ message: "Token is valid", decoded });
+    return res.status(200).json({
+      message: "Token is valid",
+      userRole: decoded.userRole,
+      decoded,
+    });
   });
 });
 
