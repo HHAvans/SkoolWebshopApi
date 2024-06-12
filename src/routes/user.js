@@ -271,8 +271,8 @@ router.put('/:id', async (req, res) => {
     }
 })
 
-router.put('/changeRole', async (req, res) => {
-    console.log('PUT /user/changeRole');
+router.post('/changeRole', async (req, res) => {
+    console.log('POST /user/changeRole');
     console.log('Req body:', req.body);
 
     try {
