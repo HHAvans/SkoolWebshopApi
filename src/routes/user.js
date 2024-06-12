@@ -250,5 +250,46 @@ router.put('/:id', async (req, res) => {
     }
 })
 
+router.put('/changeRole', async (req, res) => {
+    console.log('PUT /user/changeRole');
+    console.log('Req body:', req.body);
+
+    try {
+        const { Username, role, salary } = req.body;
+        if (!Username || !role || !salary) {
+            return res.status(400).json({ status: 400, message: 'Username, role and salary are required' });
+        }
+
+        const trimmedUsername = Username.trim();
+        console.log(`Updating user ${trimmedUsername} to role ${role} and salary ${salary}`);
+
+        const pool = await poolPromise;
+        console.log('Executing query on database: UPDATE [User] SET Role = @role, SalaryPerHourInEuro = @salary WHERE Username = @username');
+
+        const result = await pool.request()
+            .input('role', role)
+            .input('salary', salary)
+            .input('username', trimmedUsername) // Trim any extra spaces
+            .query('UPDATE [User] SET Role = @role, SalaryPerHourInEuro = @salary WHERE Username = @username');
+
+        console.log('Query result:', result);
+
+        if (result.rowsAffected[0] > 0) {
+            res.status(200).json({
+                status: 200,
+                message: "User role and salary updated successfully"
+            });
+        } else {
+            res.status(404).json({
+                status: 404,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        console.error('Database query error:', error);
+        res.status(500).json({ error: 'Database Query Error' });
+    }
+});
+
 
 module.exports = router;
