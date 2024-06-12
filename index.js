@@ -4,7 +4,6 @@ const cors = require("cors");
 const app = express();
 const path = require("path");
 
-
 const corsOptions = {
   origin: "*", // Allows all origins
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Allows all HTTP methods
@@ -29,7 +28,6 @@ const commissionRoutes = require("./src/routes/commission.js");
 const emailRoutes = require("./src/routes/email.js");
 const workshopCommissionRoutes = require("./src/routes/workshopcommission.js");
 const optionsRoutes = require("./src/routes/options.js");
-const validateTokenRoute = require("./src/routes/validateToken.js");
 const workshopCommissionUserRoutes = require("./src/routes/workshopcommissionuser.js");
 
 app.use("/user", userRoutes);
@@ -41,7 +39,6 @@ app.use("/commission/:id", commissionRoutes);
 app.use("/email", emailRoutes);
 app.use("/workshopcommission", workshopCommissionRoutes);
 app.use("/options", optionsRoutes);
-app.use("/auth", validateTokenRoute);
 app.use("/workshopcommissionuser", workshopCommissionUserRoutes);
 
 // serve the html

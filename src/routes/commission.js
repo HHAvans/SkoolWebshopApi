@@ -12,12 +12,38 @@ router.get("/all/nouser", async (req, res) => {
     const pool = await poolPromise;
     const query = `
     SELECT 
-      CommissionWorkshopId, CommissionId, StartTime, EndTime, NumberOfParticipants, Location, Level, 
-      WorkshopNotes, Workshop.WorkshopId, WorkshopName, Workshop.Category, Workshop.Requirements, 
-      Workshop.Description, Workshop.LinkToPicture
-    FROM CommissionWorkshop t1
-    INNER JOIN Workshop ON t1.WorkshopId = Workshop.WorkshopId
-    WHERE NOT EXISTS (SELECT t2.CommissionWorkshopId, t2.Status FROM CommissionWorkshopUser t2 WHERE t1.CommissionWorkshopId = t2.CommissionWorkshopId AND t2.Status = 'Toegewezen')`;
+    CommissionWorkshop.CommissionWorkshopId, 
+    Workshop.WorkshopName, 
+    CONVERT(VARCHAR(10), Commission.Date, 120) AS Date, 
+    CONVERT(VARCHAR(8), CommissionWorkshop.StartTime, 108) AS StartTime, 
+    CONVERT(VARCHAR(8), CommissionWorkshop.EndTime, 108) AS EndTime, 
+    Workshop.Requirements, 
+    Workshop.Category, 
+    Commission.CommissionName, 
+    CommissionWorkshop.Location, 
+    Workshop.LinkToPicture 
+FROM 
+    CommissionWorkshop 
+INNER JOIN 
+    Commission 
+ON 
+    CommissionWorkshop.CommissionId = Commission.CommissionId 
+INNER JOIN 
+    Workshop 
+ON 
+    CommissionWorkshop.WorkshopId = Workshop.WorkshopId 
+WHERE 
+    NOT EXISTS (
+        SELECT 1 
+        FROM CommissionWorkshopUser t2 
+        WHERE 
+            CommissionWorkshop.CommissionWorkshopId = t2.CommissionWorkshopId 
+            AND t2.Status = 'Toegewezen'
+    )
+ORDER BY 
+    Commission.Date, CommissionWorkshop.StartTime;
+
+    `;
     console.log("EXECUTING QUERY ON DATABASE: " + query);
     const result = await pool.request().query(query);
     res.json({

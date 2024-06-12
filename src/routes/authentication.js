@@ -69,9 +69,10 @@ router.post("/login", async (req, res) => {
         status: 200,
         message: "Login successful",
         // Also give permissions to front-end to determine what to show
-        data: { 
-            userRole: user.Permission, 
-            token },
+        data: {
+          userRole: user.Permission,
+          token,
+        },
       });
     }
   } catch (error) {
