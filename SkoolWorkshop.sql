@@ -1,10 +1,10 @@
-﻿DROP TABLE IF EXISTS "EmailTemplate";
+﻿DROP TABLE IF EXISTS "UserWorkshop"; 
+DROP TABLE IF EXISTS "EmailTemplate";
 DROP TABLE IF EXISTS "CommissionWorkshopUser";
 DROP TABLE IF EXISTS "CommissionWorkshop";
 DROP TABLE IF EXISTS "Workshop";
 DROP TABLE IF EXISTS "Commission";
 DROP TABLE IF EXISTS "Client";
-DROP TABLE IF EXISTS "UserWorkshop"; 
 DROP TABLE IF EXISTS "User";
 
 
@@ -60,6 +60,14 @@ CREATE TABLE UserWorkshop (
 	WorkshopId				INTEGER			NOT NULL
 
 	PRIMARY KEY (UserId, WorkshopId)
+
+	CONSTRAINT FK_UserWorkshop_User FOREIGN KEY (UserId) REFERENCES "User" (UserId)
+	ON DELETE NO ACTION
+	ON UPDATE CASCADE,
+
+	CONSTRAINT FK_UserWorkshop_Workshop FOREIGN KEY (WorkshopId) REFERENCES Workshop (WorkshopId)
+	ON DELETE NO ACTION
+	ON UPDATE CASCADE,
 );
 
 CREATE TABLE Client (
@@ -155,12 +163,18 @@ INSERT INTO Workshop (WorkshopName, Category, Requirements, Description, LinkToP
 ('Python Programmeren', 'Technologie', 'Laptop', 'Introductie tot Python programmeren voor beginners.', 'https://skoolworkshop.nl/wp-content/uploads/2023/09/Workshop-Podcast-Maken.jpg'),
 ('Java Programmeren', 'Technologie', 'Laptop', 'Introductie tot Java programmeren voor beginners.', 'https://skoolworkshop.nl/wp-content/uploads/2023/09/Workshop-Podcast-Maken.jpg');
 
+INSERT INTO UserWorkshop (UserId, WorkshopId) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(2, 2),
+(2, 3),
+(3, 2);
 
 INSERT INTO Client (ClientName, Organisation, TargetAudience, ContactPerson, Email, PhoneNumber, Address, KvkNumber) VALUES
 ('Avans Informatica B', 'Avans Hogeschool B.V', 'Studenten', 'Marjolein Gerdes', 'mj.gerdes@avans.nl', '+31633335555', 'Lovensdijkstraat 63', 854321),
 ('Technische Universiteit', 'Technische Universiteit Inc.', 'Studenten', 'Sarah Lee', 'sarah.lee@technischeuniversiteit.com', '+31644445555', 'Technologische Laan 42', 654321),
 ('Wereldwijde Corp', 'Wereldwijde Corporatie', 'Werknemers', 'Michael Bruin', 'michael.bruin@wereldwijdecorp.com', '+31655556666', 'Zakelijk Plaza 78', 987654);
-
 
 INSERT INTO "Commission" (ClientId, CommissionName, Address, Date, CommissionNotes, AmountOfRounds, StartTimeDay, EndTimeDay) VALUES
 ((SELECT ClientId FROM Client WHERE ClientName = 'Technische Universiteit'), 'Programmeren Bootcamp', 'Technische Universiteit Campus', '2024-07-15', 'Een uitgebreide bootcamp over programmeren.', 1, '13:00', '17:00'),
