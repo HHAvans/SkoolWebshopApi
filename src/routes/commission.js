@@ -139,10 +139,11 @@ router.get("/:id", async (req, res) => {
       FROM CommissionWorkshop CW
       JOIN Commission C ON C.CommissionId = CW.CommissionId
       LEFT JOIN CommissionWorkshopUser CWU ON CWU.CommissionWorkshopId = CW.CommissionWorkshopId
+      AND CWU.Status = 'Toegewezen'
       LEFT JOIN [User] U ON U.UserId = CWU.UserId
       JOIN Workshop W ON W.WorkshopId = CW.WorkshopId
       JOIN Client CL ON CL.ClientId = C.ClientId
-      WHERE CW.CommissionId = ${req.params.id};
+      WHERE CW.CommissionId = ${req.params.id} AND (CWU.UserId IS NULL OR CWU.Status = 'Toegewezen');
     `;
     
 
