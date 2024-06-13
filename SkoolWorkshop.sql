@@ -207,7 +207,9 @@ INSERT INTO "EmailTemplate" (Name, Content) VALUES
 
 ('Cancellation', 'Beste {FirstName},' + CHAR(13) + CHAR(13) + 'We hebben uw annulering voor de {Workshop} op {ExecutionDate} in {City} ontvangen.' + CHAR(13) + CHAR(13) + 'Reden: {Reden}' + CHAR(13) + CHAR(13) + 'We hopen je snel weer in te kunnen zetten.' + CHAR(13) + CHAR(13) + 'Met vriendelijke groeten, Team Skool Workshop Veilingkade 15 | 4815 HC Breda | Tel. 085 – 0653923 | App. 06 – 28318842 Mail. info@skoolworkshop.nl | Web. www.skoolworkshop.nl'),
 
-('RegistrationConfirmation', 'Beste {FirstName},' + CHAR(13) + CHAR(13) + 'Leuk dat je ons team wil versterken met het geven van workshops.' + CHAR(13) + CHAR(13) + 'Wij hebben je opgenomen in ons docentenregister. Login om jouw profiel bij te werken, zodat jij jezelf kan gaan aanmelden voor opdrachten.' + CHAR(13) + CHAR(13) + 'Met vriendelijke groeten, Team Skool Workshop Veilingkade 15 | 4815 HC Breda | Tel. 085 - 0653923 | App. 06 - 28318842 Mail. info@skoolworkshop.nl | Web. www.skoolworkshop.nl');
+('RegistrationConfirmation', 'Beste {FirstName},' + CHAR(13) + CHAR(13) + 'Leuk dat je ons team wil versterken met het geven van workshops.' + CHAR(13) + CHAR(13) + 'Wij hebben je opgenomen in ons docentenregister. Login om jouw profiel bij te werken, zodat jij jezelf kan gaan aanmelden voor opdrachten.' + CHAR(13) + CHAR(13) + 'Met vriendelijke groeten, Team Skool Workshop Veilingkade 15 | 4815 HC Breda | Tel. 085 - 0653923 | App. 06 - 28318842 Mail. info@skoolworkshop.nl | Web. www.skoolworkshop.nl'),
+
+('Registration', 'Beste {FirstName},' + CHAR(13) + CHAR(13) + 'De registratie van je account is in goede orde ontvangen!' + CHAR(13) + CHAR(13) + 'Zodra SkoolWorkshop jouw aanmelding heeft goedgekeurd zal je een mail ontvangen met een link naar de inlogpagina.' + CHAR(13) + CHAR(13) + 'Met vriendelijke groeten, Team Skool Workshop Veilingkade 15 | 4815 HC Breda | Tel. 085 - 0653923 | App. 06 - 28318842 Mail. info@skoolworkshop.nl | Web. www.skoolworkshop.nl');
 
 
 
