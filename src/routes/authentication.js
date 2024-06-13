@@ -24,14 +24,13 @@ router.post("/login", async (req, res) => {
 
   try {
     const pool = await poolPromise;
+    const query = "SELECT UserId, Username, Password, Permission FROM [User] WHERE Email = @Email AND Status = 'Toegewezen'"
     console.log(
       `EXECUTING QUERY ON DATABASE: SELECT UserId, Username, Password FROM [User] WHERE Email = @Email`
     );
     const request = pool.request();
     request.input("Email", sql.VarChar, email);
-    const result = await request.query(
-      "SELECT UserId, Username, Password, Permission FROM [User] WHERE Email = @Email"
-    );
+    const result = await request.query(query);
 
     // If no users are found with that email
     if (result.recordset.length === 0) {
