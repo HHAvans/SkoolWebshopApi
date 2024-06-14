@@ -169,10 +169,11 @@ router.get('/:userId', async (req, res) => {
         console.log(`Getting all submissions for User ID ${userId}`);
 
         const pool = await poolPromise;
-        const query = `SELECT Status, StartTime, EndTime, NumberOfParticipants, Location, WorkshopNotes, WorkshopName, Category, Requirements, Description
+        const query = `SELECT Status, CommissionName, Date, StartTime, EndTime, NumberOfParticipants, Location, WorkshopNotes, WorkshopName, Category, Requirements, Description
         FROM CommissionWorkshopUser CWU
         JOIN CommissionWorkshop CW ON CW.CommissionWorkshopId = CWU.CommissionWorkshopId
         JOIN Workshop W ON W.WorkshopId = CW.WorkshopId
+        JOIN Commission C ON C.CommissionId = CW.CommissionId
         WHERE UserId = ${userId}`;
 
         console.log('Executing query on database: ' + query);
