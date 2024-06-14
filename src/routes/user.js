@@ -204,7 +204,6 @@ router.put('/:id', async (req, res) => {
     console.log('PUT /user/:id');
 
     const userId = req.params.id;
-    const username = req.body.username;
     const email = req.body.email;
     const phoneNumber = req.body.phoneNumber;
     const address = req.body.address;
@@ -227,11 +226,9 @@ router.put('/:id', async (req, res) => {
     }
 
     const bankId = req.body.bankId;
-    const role = req.body.role;
     const publicTransit = req.body.usesPublicTransit;
     const hasCar = req.body.hasCar;
     const hasLicense = req.body.hasLicense;
-    const status = req.body.status;
 
 
     console.log(userId);
@@ -240,7 +237,6 @@ router.put('/:id', async (req, res) => {
         const pool = await poolPromise;
         const query = `UPDATE "User"
         SET 
-            UserName = '${username}',
             Email = '${email}',
             PhoneNumber = '${phoneNumber}',
             Address = '${address}',
@@ -250,11 +246,9 @@ router.put('/:id', async (req, res) => {
             BTWNumber = ${BTWNumber},
             KVKNumber = ${KVKNumber},
             BankId = '${bankId}',
-            role = '${role}',
             UsesPublicTransit = '${publicTransit}',
             HasCar = '${hasCar}',
             HasLicense = '${hasLicense}',
-            Status = '${status}' 
         WHERE 
         [UserId] = ${userId}`;
         console.log('EXECUTING QUERY ON DATABASE:', query);
