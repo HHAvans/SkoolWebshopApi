@@ -155,6 +155,53 @@ router.delete('/delete', async (req, res) => {
     }
 });
 
+router.get('/:userId', async (req, res) => {
+    console.log('GET /getByUserId');
+    console.log('Request params:', req.params);
+
+    try {
+        const userId = req.params.userId;
+
+        if (!userId) {
+            return res.status(400).json({ status: 400, message: 'userId is required' });
+        }
+
+        console.log(`Getting all submissions for User ID ${userId}`);
+
+        const pool = await poolPromise;
+        const query = `SELECT Status, StartTime, EndTime, NumberOfParticipants, Location, WorkshopNotes, WorkshopName, Category, Requirements, Description
+        FROM CommissionWorkshopUser CWU
+        JOIN CommissionWorkshop CW ON CW.CommissionWorkshopId = CWU.CommissionWorkshopId
+        JOIN Workshop W ON W.WorkshopId = CW.WorkshopId
+        WHERE UserId = ${userId}`;
+
+        console.log('Executing query on database: ' + query);
+
+        // Await the query execution and handle the result
+        const result = await pool.request().query(query);
+
+        console.log('Query result:', result);
+
+        // Check if result.recordset exists and has elements
+        if (result.recordset && result.recordset.length > 0) {
+            res.status(200).json({
+                status: 200,
+                data: result.recordset,
+                message: "Submissions retrieved successfully"
+            });
+        } else {
+            res.status(404).json({
+                status: 404,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        console.error('Database query error:', error);
+        res.status(500).json({ error: 'Database Query Error' });
+    }
+});
+
+
 
 
 module.exports = router;
