@@ -46,7 +46,7 @@ app.use("/workshopcommission", workshopCommissionRoutes);
 app.use("/options", optionsRoutes);
 app.use("/workshopcommissionuser", workshopCommissionUserRoutes);
 
-// serve the html
+// Serve the html
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "addCommission.html"));
 });
