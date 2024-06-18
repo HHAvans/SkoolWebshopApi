@@ -250,31 +250,50 @@ router.put("/:id", async (req, res) => {
     const query = `
       UPDATE "User"
       SET 
-        UserName = '${username}',
-        Email = '${email}',
-        PhoneNumber = '${phoneNumber}',
-        Address = '${address}',
-        PostalCode = '${postalCode}',
-        Country = '${country}',
-        Language = '${language}',
-        BTWNumber = ${BTWNumber || 'NULL'},  -- Handle null or undefined values for BTWNumber
-        KVKNumber = ${KVKNumber || 'NULL'},  -- Handle null or undefined values for KVKNumber
-        BankId = '${bankId}',
-        Role = '${role}',
-        UsesPublicTransit = '${usesPublicTransit}',
-        HasCar = '${hasCar}',
-        HasLicense = '${hasLicense}',
-        Status = '${status}' 
+        UserName = @username,
+        Email = @Email,
+        PhoneNumber = @PhoneNumber,
+        Address = @Address,
+        PostalCode = @PostalCode,
+        Country = @Country,
+        Language = @Language,
+        BTWNumber = @BTWNumber,
+        KVKNumber = @KVKNumber,
+        BankId = @BankId,
+        Role = @Role,
+        UsesPublicTransit = @UsesPublicTransit,
+        HasCar = @HasCar,
+        HasLicense = @HasLicense,
+        Status = @Status 
       WHERE 
-        UserId = ${userId}`;
+        UserId = @UserId`;
+
+    console.log("Executing query:", query);
     
-    console.log("EXECUTING QUERY ON DATABASE:", query);
-    const result = await pool.request().query(query);
+    const request = pool.request();
+    request.input('UserId', sql.Int, userId)
+           .input('UserName', sql.NVarChar, username)
+           .input('Email', sql.NVarChar, email)
+           .input('PhoneNumber', sql.NVarChar, phoneNumber)
+           .input('Address', sql.NVarChar, address)
+           .input('PostalCode', sql.NVarChar, postalCode)
+           .input('Country', sql.NVarChar, country)
+           .input('Language', sql.NVarChar, language)
+           .input('BTWNumber', sql.NVarChar, BTWNumber || null)
+           .input('KVKNumber', sql.NVarChar, KVKNumber || null)
+           .input('BankId', sql.NVarChar, bankId)
+           .input('Role', sql.NVarChar, role)
+           .input('UsesPublicTransit', sql.Bit, usesPublicTransit === 'true')
+           .input('HasCar', sql.Bit, hasCar === 'true')
+           .input('HasLicense', sql.Bit, hasLicense === 'true')
+           .input('Status', sql.NVarChar, status);
+
+    const result = await request.query(query);
 
     res.json({
       status: 200,
       message: "User updated",
-      data: result.rowsAffected  // Return the number of rows affected
+      data: result.rowsAffected
     });
   } catch (error) {
     console.error("Database query error:", error);
