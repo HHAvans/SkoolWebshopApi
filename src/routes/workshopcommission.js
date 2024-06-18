@@ -177,7 +177,7 @@ router.post("/add", async (req, res) => {
         .input('CommissionId', sql.Int, commissionId)
         .input('WorkshopId', sql.Int, workshopId)
         .input('MaxUsers', sql.Int, workshop.maxusers)
-        .input('NumberOfParticipants', sql.Int, workshop.numberofparticipents)
+        .input('NumberOfParticipants', sql.Int, workshop.numberofparticipants)
         .input('Level', sql.NVarChar(255), workshop.level)
         .input('StartTime', sql.DateTime, `1970-01-01 ${workshop.starttime}`)
         .input('EndTime', sql.DateTime, `1970-01-01 ${workshop.endtime}`)
