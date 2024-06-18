@@ -377,11 +377,7 @@ router.post("/add", async (req, res) => {
     !Country ||
     !Language ||
     !BankId ||
-    !Role ||
-    SalaryPerHourInEuro === undefined ||
-    UsesPublicTransit === undefined ||
-    HasCar === undefined ||
-    HasLicense === undefined
+    !Role
   ) {
     return res.status(400).json({
       status: 400,
