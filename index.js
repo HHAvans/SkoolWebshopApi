@@ -74,11 +74,11 @@ app.listen(port, "0.0.0.0", () => {
   console.log(`Server is running on port ${port}`);
 });
 
-// Helper function to replace placeholders in text with actual data
-function replacePlaceholders(textWithPlaceholders, userData) {
-  // Replace placeholders with actual data
-  let text = textWithPlaceholders.replace("{name}", userData.name);
-  text = text.replace("{email}", userData.email);
-  // Add more replacements as needed
-  return text;
-}
+// // Helper function to replace placeholders in text with actual data
+// function replacePlaceholders(textWithPlaceholders, userData) {
+//   // Replace placeholders with actual data
+//   let text = textWithPlaceholders.replace("{name}", userData.name);
+//   text = text.replace("{email}", userData.email);
+//   // Add more replacements as needed
+//   return text;
+// }
