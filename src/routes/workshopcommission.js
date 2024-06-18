@@ -202,23 +202,25 @@ router.get("/status/unassigned", async (req, res) => {
     const pool = await poolPromise;
     const query = `
     SELECT 
-    cwu.UserId,
-    cwu.CommissionWorkshopId,
-    cw.CommissionId,
-    w.WorkshopName,
-    w.Category,
-    c.ClientName,
-    c.ClientId AS Client_ClientId
+    CommissionWorkshop.CommissionWorkshopId,
+    CommissionWorkshopUser.UserId,
+    Workshop.WorkshopName,
+    Workshop.Category,
+    Client.ClientName,
+    CommissionWorkshop.Location,
+    [User].Username
 FROM 
-    CommissionWorkshopUser cwu
+    CommissionWorkshopUser
 INNER JOIN 
-    CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
+    CommissionWorkshop ON CommissionWorkshopUser.CommissionWorkshopId = CommissionWorkshop.CommissionWorkshopId
 INNER JOIN 
-    Workshop w ON cw.WorkshopId = w.WorkshopId
+    Workshop ON CommissionWorkshop.WorkshopId = Workshop.WorkshopId
+INNER JOIN 
+    Client ON CommissionWorkshop.CommissionId = Client.ClientId
 LEFT JOIN 
-    Client c ON cw.CommissionId = c.ClientId
+    [User] ON CommissionWorkshopUser.UserId = [User].UserId
 WHERE 
-    cwu.Status = 'Afwachtend';
+    CommissionWorkshopUser.Status = 'Afwachtend'
     `;
 
     console.log("EXECUTING QUERY ON DATABASE: " + query);
