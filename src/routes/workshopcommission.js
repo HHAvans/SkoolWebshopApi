@@ -168,8 +168,8 @@ router.post("/add", async (req, res) => {
       const workshopId = workshopIdResult.recordset[0].WorkshopId;
 
       const workshopQuery = `
-        INSERT INTO CommissionWorkshop (CommissionId, WorkshopId, MaxUsers, NumberOfParticipants, Level, StartTime, EndTime, Location, WorkshopNotes, SelectedRound)
-        VALUES (@CommissionId, @WorkshopId, @MaxUsers, @NumberOfParticipants, @Level, @StartTime, @EndTime, @Location, @WorkshopNotes, @SelectedRound);
+        INSERT INTO CommissionWorkshop (CommissionId, WorkshopId, MaxUsers, NumberOfParticipants, Level, StartTime, EndTime, Location, WorkshopNotes)
+        VALUES (@CommissionId, @WorkshopId, @MaxUsers, @NumberOfParticipants, @Level, @StartTime, @EndTime, @Location, @WorkshopNotes);
       `;
       console.log("EXECUTING QUERY ON DATABASE: " + workshopQuery);
 
@@ -183,7 +183,6 @@ router.post("/add", async (req, res) => {
         .input('EndTime', sql.DateTime, `1970-01-01 ${workshop.endtime}`)
         .input('Location', sql.NVarChar(255), workshop.location)
         .input('WorkshopNotes', sql.NVarChar(255), workshop.workshopnotes)
-        .input('SelectedRound', sql.Int, workshop.selectedround)
         .query(workshopQuery);
     }
 
@@ -203,25 +202,23 @@ router.get("/status/unassigned", async (req, res) => {
     const pool = await poolPromise;
     const query = `
     SELECT 
-    CommissionWorkshop.CommissionWorkshopId,
-    CommissionWorkshopUser.UserId,
-    Workshop.WorkshopName,
-    Workshop.Category,
-    Client.ClientName,
-    CommissionWorkshop.Location,
-    [User].Username
+    cwu.UserId,
+    cwu.CommissionWorkshopId,
+    cw.CommissionId,
+    w.WorkshopName,
+    w.Category,
+    c.ClientName,
+    c.ClientId AS Client_ClientId
 FROM 
-    CommissionWorkshopUser
+    CommissionWorkshopUser cwu
 INNER JOIN 
-    CommissionWorkshop ON CommissionWorkshopUser.CommissionWorkshopId = CommissionWorkshop.CommissionWorkshopId
+    CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
 INNER JOIN 
-    Workshop ON CommissionWorkshop.WorkshopId = Workshop.WorkshopId
-INNER JOIN 
-    Client ON CommissionWorkshop.CommissionId = Client.ClientId
+    Workshop w ON cw.WorkshopId = w.WorkshopId
 LEFT JOIN 
-    [User] ON CommissionWorkshopUser.UserId = [User].UserId
+    Client c ON cw.CommissionId = c.ClientId
 WHERE 
-    CommissionWorkshopUser.Status = 'Afwachtend'
+    cwu.Status = 'Afwachtend';
     `;
 
     console.log("EXECUTING QUERY ON DATABASE: " + query);

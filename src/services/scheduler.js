@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const { sql, poolPromise } = require('../dao/sqldao'); // Adjust the path as necessary
-const { sendEmail, wrapInHtml } = require('../services/emailService');
+const { sendEmail, wrapInHtml } = require('./emailService');
 
 // Function to replace placeholders in the template with actual data
 function replacePlaceholders(template, data) {
@@ -45,7 +45,7 @@ async function sendWorkshopReminders() {
                 Workshop w ON cw.WorkshopId = w.WorkshopId
             WHERE 
                 CAST(CONCAT(CONVERT(VARCHAR(10), c.Date, 120), ' ', CONVERT(VARCHAR(8), cw.StartTime, 108)) AS DATETIME) 
-                BETWEEN DATEADD(HOUR, 1, GETDATE()) AND DATEADD(HOUR, 48, GETDATE());
+                BETWEEN DATEADD(HOUR, 24, GETDATE()) AND DATEADD(HOUR, 48, GETDATE());
         `;
         console.log(workshopQuery)
         const workshopResult = await pool.request().query(workshopQuery);

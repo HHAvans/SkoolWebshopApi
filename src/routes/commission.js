@@ -76,13 +76,16 @@ router.get("/all", async (req, res) => {
         C.CommissionNotes,
         W.WorkshopId,
         W.WorkshopName,
-        U.Username AS TeacherName
+        CASE 
+          WHEN CWU.Status = 'Toegewezen' THEN U.Username
+          ELSE NULL
+        END AS TeacherName --case om toegewezen teacher te tonen
       FROM Commission C
       LEFT JOIN CommissionWorkshop CW ON C.CommissionId = CW.CommissionId
       LEFT JOIN Workshop W ON CW.WorkshopId = W.WorkshopId
       LEFT JOIN CommissionWorkshopUser CWU ON CW.CommissionWorkshopId = CWU.CommissionWorkshopId
       LEFT JOIN [User] U ON CWU.UserId = U.UserId
-      ORDER BY C.CommissionId;
+      ORDER BY C.CommissionId
     `;
 
     console.log("EXECUTING QUERY ON DATABASE: " + query);
@@ -139,10 +142,11 @@ router.get("/:id", async (req, res) => {
       FROM CommissionWorkshop CW
       JOIN Commission C ON C.CommissionId = CW.CommissionId
       LEFT JOIN CommissionWorkshopUser CWU ON CWU.CommissionWorkshopId = CW.CommissionWorkshopId
+      AND CWU.Status = 'Toegewezen'
       LEFT JOIN [User] U ON U.UserId = CWU.UserId
       JOIN Workshop W ON W.WorkshopId = CW.WorkshopId
       JOIN Client CL ON CL.ClientId = C.ClientId
-      WHERE CW.CommissionId = ${req.params.id};
+      WHERE CW.CommissionId = ${req.params.id} AND (CWU.UserId IS NULL OR CWU.Status = 'Toegewezen');
     `;
     
 
