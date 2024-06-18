@@ -396,7 +396,7 @@ router.post("/add", async (req, res) => {
   try {
     const pool = await poolPromise;
     const query = `
-      INSERT INTO [User] (
+      INSERT INTO "User" (
         Username, Birthdate, City, Address, Email, Password, PhoneNumber, PostalCode,
         Country, Language, BTWNumber, KVKNumber, BankId, Role, Permission, SalaryPerHourInEuro,
         UsesPublicTransit, HasCar, HasLicense, Status
