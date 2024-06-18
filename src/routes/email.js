@@ -191,29 +191,29 @@ router.post('/send', async (req, res) => {
         const userResult = await pool.request()
             .input('userId', sql.Int, userId)   
             .query(`
-                SELECT 
-                    u.Username,
-                    u.Email,
-                    w.WorkshopName,
-                    c.ClientName,
-                    FORMAT(com.StartTimeDay, 'dd-MM-yyyy') AS StartTimeDay,
-                    FORMAT(com.EndTimeDay, 'dd-MM-yyyy') AS EndTimeDay,
-                    FORMAT(cw.StartTime, 'HH:mm:ss') AS StartTime,
-                    FORMAT(cw.EndTime, 'HH:mm:ss') AS EndTime,
-                    FORMAT(com.Date, 'dd-MM-yyyy') AS Date,
+          	SELECT 
+    u.Username,
+    u.Email,
+    w.WorkshopName,
+    c.ClientName,
+    CONVERT(VARCHAR(8), COALESCE(com.StartTimeDay, '00:00'), 108) AS StartTimeDay,
+   CONVERT(VARCHAR(8), COALESCE(com.EndTimeDay, '00:00'), 108) AS EndTimeDay,
+    CONVERT(VARCHAR(8), COALESCE(cw.StartTime, '00:00'), 108) AS StartTime,
+    CONVERT(VARCHAR(8), COALESCE(cw.EndTime, '00:00'), 108) AS EndTime,
+     FORMAT(com.Date, 'dd-MM-yyyy') AS Date,
                     com.Address
-                FROM 
-                    [User] u
-                JOIN 
-                    CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
-                JOIN 
-                    CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
-                JOIN 
-                    Commission com ON cw.CommissionId = com.CommissionId
-                JOIN 
-                    Client c ON com.ClientId = c.ClientId
-                JOIN 
-                    Workshop w ON cw.WorkshopId = w.WorkshopId;
+FROM 
+    [User] u
+JOIN 
+    CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
+JOIN 
+    CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
+JOIN 
+    Commission com ON cw.CommissionId = com.CommissionId
+JOIN 
+    Client c ON com.ClientId = c.ClientId
+JOIN 
+    Workshop w ON cw.WorkshopId = w.WorkshopId;
             `)
 
         if (userResult.recordset.length === 0) {
