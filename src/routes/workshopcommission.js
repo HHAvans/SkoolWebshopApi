@@ -168,8 +168,8 @@ router.post("/add", async (req, res) => {
       const workshopId = workshopIdResult.recordset[0].WorkshopId;
 
       const workshopQuery = `
-        INSERT INTO CommissionWorkshop (CommissionId, WorkshopId, MaxUsers, NumberOfParticipants, Level, StartTime, EndTime, Location, WorkshopNotes, SelectedRound)
-        VALUES (@CommissionId, @WorkshopId, @MaxUsers, @NumberOfParticipants, @Level, @StartTime, @EndTime, @Location, @WorkshopNotes, @SelectedRound);
+        INSERT INTO CommissionWorkshop (CommissionId, WorkshopId, MaxUsers, NumberOfParticipants, Level, StartTime, EndTime, Location, WorkshopNotes)
+        VALUES (@CommissionId, @WorkshopId, @MaxUsers, @NumberOfParticipants, @Level, @StartTime, @EndTime, @Location, @WorkshopNotes);
       `;
       console.log("EXECUTING QUERY ON DATABASE: " + workshopQuery);
 
@@ -183,7 +183,6 @@ router.post("/add", async (req, res) => {
         .input('EndTime', sql.DateTime, `1970-01-01 ${workshop.endtime}`)
         .input('Location', sql.NVarChar(255), workshop.location)
         .input('WorkshopNotes', sql.NVarChar(255), workshop.workshopnotes)
-        .input('SelectedRound', sql.Int, workshop.selectedround)
         .query(workshopQuery);
     }
 
