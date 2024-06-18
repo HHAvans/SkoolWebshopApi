@@ -49,7 +49,7 @@ async function sendWorkshopReminders() {
                 Workshop w ON cw.WorkshopId = w.WorkshopId
             WHERE 
                 CAST(CONCAT(CONVERT(VARCHAR(10), c.Date, 120), ' ', CONVERT(VARCHAR(8), cw.StartTime, 108)) AS DATETIME) 
-                BETWEEN DATEADD(HOUR, 1, GETDATE()) AND DATEADD(HOUR, 48, GETDATE());
+                BETWEEN DATEADD(HOUR, 24, GETDATE()) AND DATEADD(HOUR, 48, GETDATE());
         `;
 
     const workshopResult = await pool.request().query(workshopQuery);

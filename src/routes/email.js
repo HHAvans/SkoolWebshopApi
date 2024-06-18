@@ -105,23 +105,29 @@ router.get('/mail-name/:id', async (req, res) => {
     try {
         const pool = await poolPromise;
         const query = `
-        SELECT 
-        u.Username,
-        u.Email,
-        cw.StartTime,
-        cw.EndTime,
-        cw.Location,
-        w.WorkshopName
-    FROM 
-        "User" u
-    JOIN 
-        CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
-    JOIN 
-        CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
-    JOIN 
-        Workshop w ON cw.WorkshopId = w.WorkshopId
-    WHERE 
-        u.UserId = @userId;
+     SELECT 
+    u.Username,
+    u.Email,
+    w.WorkshopName,
+    c.ClientName,
+    com.StartTimeDay,
+    com.EndTimeDay,
+    cw.StartTime,
+    cw.EndTime,
+    com.Date,
+    com.Address
+FROM 
+    "User" u
+JOIN 
+    CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
+JOIN 
+    CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
+JOIN 
+    Commission com ON cw.CommissionId = com.CommissionId
+JOIN 
+    Client c ON com.ClientId = c.ClientId
+JOIN 
+    Workshop w ON cw.WorkshopId = w.WorkshopId;
     `;
         const result = await pool.request()
             .input('userId', sql.Int, userId)
@@ -142,12 +148,24 @@ router.get('/mail-name/:id', async (req, res) => {
     }
 });
 
-// Replace placeholders in text
+// Utility function to format a date to 'DD-MM-YYYY'
+function formatDate(date) {
+    return new Date(date).toLocaleDateString('nl-NL'); // Locale set to Dutch (Netherlands)
+}
+
+// Utility function to format a time to 'HH:MM:SS'
+function formatTime(date) {
+    return new Date(date).toLocaleTimeString('nl-NL'); // Locale set to Dutch (Netherlands)
+}   
+
+// Helper function to replace placeholders in text with actual data
 function replacePlaceholders(template, data) {
     let text = template;
     for (const key in data) {
-        const placeholder = `{${key}}`;
-        text = text.replace(new RegExp(placeholder, 'g'), data[key] || ''); // Replace with empty string if data is missing
+        if (data.hasOwnProperty(key)) {
+            const placeholder = `{${key}}`;
+            text = text.replace(new RegExp(placeholder, 'g'), data[key] || ''); // Replace with empty string if data is missing
+        }
     }
     return text;
 }
@@ -171,26 +189,32 @@ router.post('/send', async (req, res) => {
 
         // Fetch user data
         const userResult = await pool.request()
-            .input('userId', sql.Int, userId)
+            .input('userId', sql.Int, userId)   
             .query(`
-            SELECT 
-            u.Username,
-            u.Email,
-            cw.StartTime,
-            cw.EndTime,
-            cw.Location,
-            w.WorkshopName
-        FROM 
-            "User" u
-        JOIN 
-            CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
-        JOIN 
-            CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
-        JOIN 
-            Workshop w ON cw.WorkshopId = w.WorkshopId
-        WHERE 
-            u.UserId = @userId;
-        `);
+                SELECT 
+                    u.Username,
+                    u.Email,
+                    w.WorkshopName,
+                    c.ClientName,
+                    FORMAT(com.StartTimeDay, 'dd-MM-yyyy') AS StartTimeDay,
+                    FORMAT(com.EndTimeDay, 'dd-MM-yyyy') AS EndTimeDay,
+                    FORMAT(cw.StartTime, 'HH:mm:ss') AS StartTime,
+                    FORMAT(cw.EndTime, 'HH:mm:ss') AS EndTime,
+                    FORMAT(com.Date, 'dd-MM-yyyy') AS Date,
+                    com.Address
+                FROM 
+                    [User] u
+                JOIN 
+                    CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
+                JOIN 
+                    CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
+                JOIN 
+                    Commission com ON cw.CommissionId = com.CommissionId
+                JOIN 
+                    Client c ON com.ClientId = c.ClientId
+                JOIN 
+                    Workshop w ON cw.WorkshopId = w.WorkshopId;
+            `)
 
         if (userResult.recordset.length === 0) {
             return res.status(404).json({ error: 'User not found' });
