@@ -245,48 +245,56 @@ router.put("/:id", async (req, res) => {
     status
   } = req.body;
 
+  let updates = [];
+  if (username) updates.push(`Username = @Username`);
+  if (email) updates.push(`Email = @Email`);
+  if (phoneNumber) updates.push(`PhoneNumber = @PhoneNumber`);
+  if (address) updates.push(`Address = @Address`);
+  if (postalCode) updates.push(`PostalCode = @PostalCode`);
+  if (country) updates.push(`Country = @Country`);
+  if (language) updates.push(`Language = @Language`);
+  if (BTWNumber) updates.push(`BTWNumber = @BTWNumber`);
+  if (KVKNumber) updates.push(`KVKNumber = @KVKNumber`);
+  if (bankId) updates.push(`BankId = @BankId`);
+  if (role) updates.push(`Role = @Role`);
+  if (usesPublicTransit !== undefined) updates.push(`UsesPublicTransit = @UsesPublicTransit`);
+  if (hasCar !== undefined) updates.push(`HasCar = @HasCar`);
+  if (hasLicense !== undefined) updates.push(`HasLicense = @HasLicense`);
+  if (status) updates.push(`Status = @Status`);
+
+  if (updates.length === 0) {
+    return res.status(400).json({ error: "No fields to update" });
+  }
+
+  const query = `
+    UPDATE "User"
+    SET ${updates.join(', ')}
+    WHERE UserId = @UserId
+  `;
+
+  console.log("Executing query:", query);
+
   try {
     const pool = await poolPromise;
-    const query = `
-      UPDATE "User"
-      SET 
-        UserName = @username,
-        Email = @Email,
-        PhoneNumber = @PhoneNumber,
-        Address = @Address,
-        PostalCode = @PostalCode,
-        Country = @Country,
-        Language = @Language,
-        BTWNumber = @BTWNumber,
-        KVKNumber = @KVKNumber,
-        BankId = @BankId,
-        Role = @Role,
-        UsesPublicTransit = @UsesPublicTransit,
-        HasCar = @HasCar,
-        HasLicense = @HasLicense,
-        Status = @Status 
-      WHERE 
-        UserId = @UserId`;
-
-    console.log("Executing query:", query);
-    
     const request = pool.request();
-    request.input('UserId', sql.Int, userId)
-           .input('UserName', sql.NVarChar, username)
-           .input('Email', sql.NVarChar, email)
-           .input('PhoneNumber', sql.NVarChar, phoneNumber)
-           .input('Address', sql.NVarChar, address)
-           .input('PostalCode', sql.NVarChar, postalCode)
-           .input('Country', sql.NVarChar, country)
-           .input('Language', sql.NVarChar, language)
-           .input('BTWNumber', sql.NVarChar, BTWNumber || null)
-           .input('KVKNumber', sql.NVarChar, KVKNumber || null)
-           .input('BankId', sql.NVarChar, bankId)
-           .input('Role', sql.NVarChar, role)
-           .input('UsesPublicTransit', sql.Bit, usesPublicTransit === 'true')
-           .input('HasCar', sql.Bit, hasCar === 'true')
-           .input('HasLicense', sql.Bit, hasLicense === 'true')
-           .input('Status', sql.NVarChar, status);
+    
+    // Adding inputs for each field to be updated
+    request.input('UserId', sql.Int, userId);
+    if (username) request.input('Username', sql.NVarChar, username);
+    if (email) request.input('Email', sql.NVarChar, email);
+    if (phoneNumber) request.input('PhoneNumber', sql.NVarChar, phoneNumber);
+    if (address) request.input('Address', sql.NVarChar, address);
+    if (postalCode) request.input('PostalCode', sql.NVarChar, postalCode);
+    if (country) request.input('Country', sql.NVarChar, country);
+    if (language) request.input('Language', sql.NVarChar, language);
+    if (BTWNumber) request.input('BTWNumber', sql.Int, BTWNumber);
+    if (KVKNumber) request.input('KVKNumber', sql.Int, KVKNumber);
+    if (bankId) request.input('BankId', sql.NVarChar, bankId);
+    if (role) request.input('Role', sql.NVarChar, role);
+    if (usesPublicTransit !== undefined) request.input('UsesPublicTransit', sql.Bit, usesPublicTransit);
+    if (hasCar !== undefined) request.input('HasCar', sql.Bit, hasCar);
+    if (hasLicense !== undefined) request.input('HasLicense', sql.Bit, hasLicense);
+    if (status) request.input('Status', sql.NVarChar, status);
 
     const result = await request.query(query);
 
@@ -295,57 +303,6 @@ router.put("/:id", async (req, res) => {
       message: "User updated",
       data: result.rowsAffected
     });
-  } catch (error) {
-    console.error("Database query error:", error);
-    res.status(500).json({ error: "Database Query Error" });
-  }
-});
-
-router.post("/changeRole", async (req, res) => {
-  console.log("POST /user/changeRole");
-  console.log("Req body:", req.body);
-
-  try {
-    const { Username, Role, SalaryPerHourInEuro } = req.body;
-    if (!Username || !Role || !SalaryPerHourInEuro) {
-      return res.status(400).json({
-        status: 400,
-        message: "Username, role, and salary are required",
-      });
-    }
-
-    const trimmedUsername = Username.trim();
-    console.log(
-      `Updating user ${trimmedUsername} to role ${Role} and salary ${SalaryPerHourInEuro}`
-    );
-
-    const pool = await poolPromise;
-    console.log(
-      "Executing query on database: UPDATE [User] SET Role = @Role, SalaryPerHourInEuro = @SalaryPerHourInEuro WHERE Username = @Username"
-    );
-
-    const result = await pool
-      .request()
-      .input("Role", Role)
-      .input("SalaryPerHourInEuro", SalaryPerHourInEuro)
-      .input("Username", trimmedUsername)
-      .query(
-        "UPDATE [User] SET Role = @Role, SalaryPerHourInEuro = @SalaryPerHourInEuro WHERE Username = @Username"
-      );
-
-    console.log("Query result:", result);
-
-    if (result.rowsAffected[0] > 0) {
-      res.status(200).json({
-        status: 200,
-        message: "User role and salary updated successfully",
-      });
-    } else {
-      res.status(404).json({
-        status: 404,
-        message: "User not found",
-      });
-    }
   } catch (error) {
     console.error("Database query error:", error);
     res.status(500).json({ error: "Database Query Error" });
