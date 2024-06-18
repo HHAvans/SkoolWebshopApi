@@ -227,67 +227,57 @@ router.put("/:id", async (req, res) => {
   console.log("PUT /user/:id");
 
   const userId = req.params.id;
-  const username = req.body.username;
-  const email = req.body.email;
-  const phoneNumber = req.body.phoneNumber;
-  const address = req.body.address;
-  const postalCode = req.body.postalCode;
-  const country = req.body.country;
-  const language = req.body.language;
-
-  let BTWNumber;
-  if (req.body.BTWNumber === null) {
-    BTWNumber = "NULL";
-  } else {
-    BTWNumber = req.body.BTWNumber;
-  }
-  let KVKNumber;
-  console.log(req.body.KVKNumber);
-  if (req.body.KVKNumber === null) {
-    KVKNumber = "NULL";
-  } else {
-    KVKNumber = req.body.KVKNumber;
-  }
-
-  const bankId = req.body.bankId;
-  const role = req.body.role;
-  const publicTransit = req.body.usesPublicTransit;
-  const hasCar = req.body.hasCar;
-  const hasLicense = req.body.hasLicense;
-  const status = req.body.status;
-
-  console.log(userId);
+  const {
+    username,
+    email,
+    phoneNumber,
+    address,
+    postalCode,
+    country,
+    language,
+    BTWNumber,
+    KVKNumber,
+    bankId,
+    role,
+    usesPublicTransit,
+    hasCar,
+    hasLicense,
+    status
+  } = req.body;
 
   try {
     const pool = await poolPromise;
-    const query = `UPDATE "User"
-        SET 
-            UserName = '${username}',
-            Email = '${email}',
-            PhoneNumber = '${phoneNumber}',
-            Address = '${address}',
-            PostalCode = '${postalCode}',
-            Country = '${country}',
-            Language = '${language}',
-            BTWNumber = ${BTWNumber},
-            KVKNumber = ${KVKNumber},
-            BankId = '${bankId}',
-            role = '${role}',
-            UsesPublicTransit = '${publicTransit}',
-            HasCar = '${hasCar}',
-            HasLicense = '${hasLicense}',
-            Status = '${status}' 
-        WHERE 
-        [UserId] = ${userId}`;
+    const query = `
+      UPDATE "User"
+      SET 
+        UserName = '${username}',
+        Email = '${email}',
+        PhoneNumber = '${phoneNumber}',
+        Address = '${address}',
+        PostalCode = '${postalCode}',
+        Country = '${country}',
+        Language = '${language}',
+        BTWNumber = ${BTWNumber || 'NULL'},  -- Handle null or undefined values for BTWNumber
+        KVKNumber = ${KVKNumber || 'NULL'},  -- Handle null or undefined values for KVKNumber
+        BankId = '${bankId}',
+        Role = '${role}',
+        UsesPublicTransit = '${usesPublicTransit}',
+        HasCar = '${hasCar}',
+        HasLicense = '${hasLicense}',
+        Status = '${status}' 
+      WHERE 
+        UserId = ${userId}`;
+    
     console.log("EXECUTING QUERY ON DATABASE:", query);
     const result = await pool.request().query(query);
+
     res.json({
       status: 200,
       message: "User updated",
-      data: result,
+      data: result.rowsAffected  // Return the number of rows affected
     });
   } catch (error) {
-    console.error("database query error:", error);
+    console.error("Database query error:", error);
     res.status(500).json({ error: "Database Query Error" });
   }
 });
