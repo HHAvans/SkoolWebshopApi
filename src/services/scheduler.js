@@ -49,11 +49,12 @@ async function sendWorkshopReminders() {
                 Workshop w ON cw.WorkshopId = w.WorkshopId
             WHERE 
                 CAST(CONCAT(CONVERT(VARCHAR(10), c.Date, 120), ' ', CONVERT(VARCHAR(8), cw.StartTime, 108)) AS DATETIME) 
-                BETWEEN DATEADD(HOUR, 1, GETDATE()) AND DATEADD(HOUR, 48, GETDATE());
+                BETWEEN DATEADD(HOUR, 24, GETDATE()) AND DATEADD(HOUR, 48, GETDATE());
         `;
-
-    const workshopResult = await pool.request().query(workshopQuery);
-    console.log("Workshop Query Result:", workshopResult);
+        console.log(workshopQuery)
+        const workshopResult = await pool.request().query(workshopQuery);
+        console.log("Workshop Query Result:", workshopResult);
+       
 
     // Debugging: Print the calculated start times
     for (const record of workshopResult.recordset) {
@@ -78,15 +79,18 @@ async function sendWorkshopReminders() {
 
       const templateContent = templateResult.recordset[0].CONTENT;
 
-      for (const userData of workshopResult.recordset) {
-        // Replace placeholders in the template
-        const emailText = replacePlaceholders(templateContent, {
-          Username: userData.Username,
-          WorkshopName: userData.WorkshopName,
-          StartTime: userData.StartTime,
-          EndTime: userData.EndTime,
-          Location: userData.Location,
-        });
+            for (const userData of workshopResult.recordset) {
+                // Replace placeholders in the template
+                const emailText = replacePlaceholders(templateContent, {
+                    Username: userData.Username,
+                    WorkshopName: userData.WorkshopName,
+                    StartTime: formatTime(userData.StartTime),
+                    EndTime: formatTime(userData.EndTime),
+                    Location: userData.Location,
+                    Date: formatDate(userData.WorkshopDate), // Use correct key from query result
+                    Address: userData.WorkshopAddress
+
+                });
 
         // Wrap in HTML
         const emailHtml = wrapInHtml(emailText);
@@ -105,7 +109,8 @@ async function sendWorkshopReminders() {
 }
 
 // Schedule the job to run once a day at midnight
-cron.schedule("0 0 * * *", () => {
-  console.log("Running workshop reminder job once a day at midnight");
-  sendWorkshopReminders();
+// for testing use '* * * * *' for every minute
+cron.schedule('0 0 * * *', () => {
+    console.log("Running workshop reminder job once a day at midnight");
+    sendWorkshopReminders();
 });
