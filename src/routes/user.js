@@ -435,4 +435,27 @@ router.post("/add", async (req, res) => {
   }
 });
 
+//get workshop per user
+router.get("/workshop/:id", async (req, res) => {
+  console.log("GET /user/workshop/:id");
+
+  try {
+    const pool = await poolPromise;
+    console.log("EXECUTING QUERY ON DATABASE: SELECT WorkshopName FROM UserWorkshop WHERE UserId = @UserId");
+    const result = await pool.request().query("SELECT WorkshopName FROM UserWorkshop WHERE UserId = " +
+        req.params.id);
+    const workshops = result.recordset;
+
+    res.json({
+      status: 200,
+      message: "Workshop(s) retrieved",
+      data: workshops
+    });
+  } catch (error) {
+    console.error("Database query error:", error);
+    res.status(500).json({ error: "Database Query Error" });
+  }
+});
+
+
 module.exports = router;
