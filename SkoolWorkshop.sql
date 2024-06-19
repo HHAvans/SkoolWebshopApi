@@ -57,15 +57,15 @@ CREATE TABLE Workshop (
 
 CREATE TABLE UserWorkshop (
 	UserId					INTEGER			NOT NULL,
-	WorkshopId				INTEGER			NOT NULL
+	WorkshopName			NVARCHAR(64)	NOT NULL
 
-	PRIMARY KEY (UserId, WorkshopId)
+	PRIMARY KEY (UserId, WorkshopName)
 
 	CONSTRAINT FK_UserWorkshop_User FOREIGN KEY (UserId) REFERENCES "User" (UserId)
 	ON DELETE NO ACTION
 	ON UPDATE CASCADE,
 
-	CONSTRAINT FK_UserWorkshop_Workshop FOREIGN KEY (WorkshopId) REFERENCES Workshop (WorkshopId)
+	CONSTRAINT FK_UserWorkshop_Workshop FOREIGN KEY (WorkshopName) REFERENCES Workshop (WorkshopName)
 	ON DELETE NO ACTION
 	ON UPDATE CASCADE,
 );
@@ -164,13 +164,13 @@ INSERT INTO Workshop (WorkshopName, Category, Requirements, Description, LinkToP
 ('Python Programmeren', 'Technologie', 'Laptop', 'Introductie tot Python programmeren voor beginners.', 'https://skoolworkshop.nl/wp-content/uploads/2023/09/Workshop-Podcast-Maken.jpg'),
 ('Java Programmeren', 'Technologie', 'Laptop', 'Introductie tot Java programmeren voor beginners.', 'https://skoolworkshop.nl/wp-content/uploads/2023/09/Workshop-Podcast-Maken.jpg');
 
-INSERT INTO UserWorkshop (UserId, WorkshopId) VALUES
-(1, 1),
-(1, 2),
-(1, 3),
-(2, 2),
-(2, 3),
-(3, 2);
+INSERT INTO UserWorkshop (UserId, WorkshopName) VALUES
+(1, 'Vloggen'),
+(1,	'Java Programmeren'),
+(1, 'Python Programmeren'),
+(2, 'Vloggen'),
+(2, 'Python Programmeren'),
+(3, 'Vloggen');
 
 INSERT INTO Client (ClientName, Organisation, TargetAudience, ContactPerson, Email, PhoneNumber, Address, KvkNumber) VALUES
 ('Avans Informatica B', 'Avans Hogeschool B.V', 'Studenten', 'Marjolein Gerdes', 'mj.gerdes@avans.nl', '+31633335555', 'Lovensdijkstraat 63', 854321),
