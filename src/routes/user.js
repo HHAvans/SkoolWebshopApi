@@ -3,6 +3,49 @@ const router = express.Router();
 const { sql, poolPromise } = require("../dao/sqldao.js");
 const bcrypt = require('bcryptjs');
 
+//update user status 19-06-2024
+router.post('/updateStatus', async (req, res) => {
+  console.log('POST /user/updateStatus');
+  console.log('Request body:', req.body);
+
+  try {
+    const { Username, status } = req.body;
+    if (!Username || !status) {
+        return res.status(400).json({ status: 400, message: 'Username and status are required' });
+    }
+
+    const trimmedUsername = Username.trim();
+    console.log(`Updating user ${trimmedUsername} to status ${status}`);
+
+    const pool = await poolPromise;
+    console.log('Executing query on database: UPDATE [User] SET Status = @status WHERE Username = @username');
+
+    const result = await pool.request()
+        .input('status', status)
+        .input('username', trimmedUsername) // Trim any extra spaces
+        .query('UPDATE [User] SET Status = @status WHERE Username = @username');
+
+    console.log('Query result:', result);
+
+    if (result.rowsAffected[0] > 0) {
+        res.status(200).json({
+            status: 200,
+            message: "User status updated successfully"
+        });
+    } else {
+        res.status(404).json({
+            status: 404,
+            message: "User not found"
+        });
+    }
+} catch (error) {
+    console.error('Database query error:', error);
+    res.status(500).json({ error: 'Database Query Error' });
+}
+});
+
+
+
 /** Get users route
  * 
  *  This route gets all the info of the users EXCEPT passwords and id's.
