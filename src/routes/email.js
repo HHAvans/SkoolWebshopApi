@@ -172,7 +172,7 @@ function replacePlaceholders(template, data) {
 
 // Send email with template and user data
 router.post('/send', async (req, res) => {
-    const { userId, templateName, emailSubject } = req.body;
+    const { userId, templateName, emailSubject, Reason } = req.body;
 
     try {
         const pool = await poolPromise;
@@ -191,38 +191,44 @@ router.post('/send', async (req, res) => {
         const userResult = await pool.request()
             .input('userId', sql.Int, userId)   
             .query(`
-          	SELECT 
-    u.Username,
-    u.Email,
-    w.WorkshopName,
-    c.ClientName,
-    CONVERT(VARCHAR(8), COALESCE(com.StartTimeDay, '00:00'), 108) AS StartTimeDay,
-   CONVERT(VARCHAR(8), COALESCE(com.EndTimeDay, '00:00'), 108) AS EndTimeDay,
-    CONVERT(VARCHAR(8), COALESCE(cw.StartTime, '00:00'), 108) AS StartTime,
-    CONVERT(VARCHAR(8), COALESCE(cw.EndTime, '00:00'), 108) AS EndTime,
-     FORMAT(com.Date, 'dd-MM-yyyy') AS Date,
+                SELECT 
+                    u.Username,
+                    u.Email,
+                    w.WorkshopName,
+                    c.ClientName,
+                    CONVERT(VARCHAR(8), COALESCE(com.StartTimeDay, '00:00'), 108) AS StartTimeDay,
+                    CONVERT(VARCHAR(8), COALESCE(com.EndTimeDay, '00:00'), 108) AS EndTimeDay,
+                    CONVERT(VARCHAR(8), COALESCE(cw.StartTime, '00:00'), 108) AS StartTime,
+                    CONVERT(VARCHAR(8), COALESCE(cw.EndTime, '00:00'), 108) AS EndTime,
+                    FORMAT(com.Date, 'dd-MM-yyyy') AS Date,
                     com.Address
-FROM 
-    [User] u
-JOIN 
-    CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
-JOIN 
-    CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
-JOIN 
-    Commission com ON cw.CommissionId = com.CommissionId
-JOIN 
-    Client c ON com.ClientId = c.ClientId
-JOIN 
-    Workshop w ON cw.WorkshopId = w.WorkshopId;
-            `)
+                FROM 
+                    [User] u
+                JOIN 
+                    CommissionWorkshopUser cwu ON u.UserId = cwu.UserId
+                JOIN 
+                    CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
+                JOIN 
+                    Commission com ON cw.CommissionId = com.CommissionId
+                JOIN 
+                    Client c ON com.ClientId = c.ClientId
+                JOIN 
+                    Workshop w ON cw.WorkshopId = w.WorkshopId
+                WHERE 
+                    u.UserId = @userId
+            `);
 
         if (userResult.recordset.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
-        const userData = userResult.recordset[0];
+        let userData = userResult.recordset[0];
+
+        // Add Reason to userData
+        userData.Reason = Reason;
 
         // Print userData for debugging
         console.log(userData);
+        console.log(Reason);
 
         // Replace placeholders
         const emailText = replacePlaceholders(template, userData);
