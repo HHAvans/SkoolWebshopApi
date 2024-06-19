@@ -358,6 +358,7 @@ router.post("/add", async (req, res) => {
     HasCar,
     HasLicense,
     Status,
+    selectedWorkshops,
   } = req.body;
 
   // Validate required fields
@@ -373,7 +374,8 @@ router.post("/add", async (req, res) => {
     !Country ||
     !Language ||
     !BankId ||
-    !Role
+    !Role ||
+    selectedWorkshops.length === 0
   ) {
     return res.status(400).json({
       status: 400,
@@ -426,6 +428,28 @@ router.post("/add", async (req, res) => {
       .input("HasLicense", sql.Bit, HasLicense)
       .input("Status", sql.NVarChar, Status)
       .query(query);
+
+
+    // Getting user id
+
+    const query2 = `
+      SELECT UserId FROM "User" WHERE Email = '@Email';
+    `
+
+    const userid = await pool
+      .request()
+      .input("Email", sql.NVarChar, Email)
+      .query(query2)
+
+    // Adding workshops to user in userworkshop
+
+    selectedWorkshops.forEach(async (workshopname) => {
+      await pool
+        .request()
+        .input("WorkshopName", sql.NVarChar, workshopname)
+        .input("UserId", sql.Int, userid)
+        .query(`INSERT INTO UserWorkshop (UserId, WorkshopName) VALUES (@UserId, @WorkshopName),`)
+    })
 
     console.log("User added:", result);
 
