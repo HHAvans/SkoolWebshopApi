@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { sql, poolPromise } = require("../dao/sqldao.js");
+const bcrypt = require('bcryptjs');
 
 /** Get users route
  * 
@@ -334,6 +335,7 @@ router.post("/add", async (req, res) => {
     HasCar,
     HasLicense,
     Status,
+    selectedWorkshops,
   } = req.body;
 
   // Validate required fields
@@ -349,7 +351,8 @@ router.post("/add", async (req, res) => {
     !Country ||
     !Language ||
     !BankId ||
-    !Role
+    !Role ||
+    selectedWorkshops.length === 0
   ) {
     return res.status(400).json({
       status: 400,
@@ -365,6 +368,9 @@ router.post("/add", async (req, res) => {
     });
   }
 
+  // Convert password to hashed password
+  const hashedPassword = bcrypt.hashSync(Password, bcrypt.genSaltSync(10));
+
   try {
     const pool = await poolPromise;
     const query = `
@@ -373,6 +379,7 @@ router.post("/add", async (req, res) => {
         Country, Language, BTWNumber, KVKNumber, BankId, Role, Permission, SalaryPerHourInEuro,
         UsesPublicTransit, HasCar, HasLicense, Status
       )
+      OUTPUT INSERTED.UserId
       VALUES (
         @Username, @Birthdate, @City, @Address, @Email, @Password, @PhoneNumber, @PostalCode,
         @Country, @Language, @BTWNumber, @KVKNumber, @BankId, @Role, 'Default', @SalaryPerHourInEuro,
@@ -387,7 +394,7 @@ router.post("/add", async (req, res) => {
       .input("City", sql.NVarChar, City)
       .input("Address", sql.NVarChar, Address)
       .input("Email", sql.NVarChar, Email)
-      .input("Password", sql.NVarChar, Password)
+      .input("Password", sql.NVarChar, hashedPassword)
       .input("PhoneNumber", sql.NVarChar, PhoneNumber)
       .input("PostalCode", sql.NVarChar, PostalCode)
       .input("Country", sql.NVarChar, Country)
@@ -403,12 +410,24 @@ router.post("/add", async (req, res) => {
       .input("Status", sql.NVarChar, Status)
       .query(query);
 
+    const userId = result.recordset[0].UserId;
+
+    // Adding workshops to user in userworkshop
+    for (const workshopname of selectedWorkshops) {
+      await pool
+        .request()
+        .input("UserId", sql.Int, userId)
+        .input("WorkshopName", sql.NVarChar, workshopname)
+        .query("INSERT INTO UserWorkshop (UserId, WorkshopName) VALUES (@UserId, @WorkshopName)");
+    }
+
     console.log("User added:", result);
 
     res.status(201).json({
       status: 201,
       message: "User added successfully",
       data: {
+        UserId: userId,
         Username,
         Birthdate,
         City,
@@ -427,6 +446,7 @@ router.post("/add", async (req, res) => {
         HasCar,
         HasLicense,
         Status,
+        selectedWorkshops,
       },
     });
   } catch (error) {
