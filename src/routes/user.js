@@ -495,9 +495,9 @@ router.post('/changeRole', async (req, res) => {
       console.log('Executing query on database: UPDATE [User] SET Role = @Role, SalaryPerHourInEuro = @SalaryPerHourInEuro WHERE Username = @Username');
 
       const result = await pool.request()
-          .input('Role', Role)
-          .input('SalaryPerHourInEuro', SalaryPerHourInEuro)
-          .input('Username', trimmedUsername)
+          .input('Role', sql.NVarChar, Role)
+          .input('SalaryPerHourInEuro', sql.Decimal, SalaryPerHourInEuro)
+          .input('Username', sql.NVarChar, trimmedUsername)
           .query('UPDATE [User] SET Role = @Role, SalaryPerHourInEuro = @SalaryPerHourInEuro WHERE Username = @Username');
 
       console.log('Query result:', result);
