@@ -104,7 +104,7 @@ CREATE TABLE "CommissionWorkshop" (
 	WorkshopId INTEGER NOT NULL,
 	StartTime TIME NOT NULL,
 	EndTime TIME NOT NULL,
-	SelectedRound INTEGER NOT NULL,
+	SelectedRound INTEGER,
 	MaxUsers INT NOT NULL,
 	NumberOfParticipants INTEGER NOT NULL,
 	Location NVARCHAR(100),
