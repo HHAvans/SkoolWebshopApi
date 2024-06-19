@@ -375,6 +375,7 @@ router.post("/add", async (req, res) => {
         Country, Language, BTWNumber, KVKNumber, BankId, Role, Permission, SalaryPerHourInEuro,
         UsesPublicTransit, HasCar, HasLicense, Status
       )
+      OUTPUT INSERTED.UserId
       VALUES (
         @Username, @Birthdate, @City, @Address, @Email, @Password, @PhoneNumber, @PostalCode,
         @Country, @Language, @BTWNumber, @KVKNumber, @BankId, @Role, 'Default', @SalaryPerHourInEuro,
@@ -405,27 +406,16 @@ router.post("/add", async (req, res) => {
       .input("Status", sql.NVarChar, Status)
       .query(query);
 
-
-    // Getting user id
-
-    const query2 = `
-      SELECT UserId FROM "User" WHERE Email = '@Email';
-    `
-
-    const userid = await pool
-      .request()
-      .input("Email", sql.NVarChar, Email)
-      .query(query2)
+    const userId = result.recordset[0].UserId;
 
     // Adding workshops to user in userworkshop
-
-    selectedWorkshops.forEach(async (workshopname) => {
+    for (const workshopname of selectedWorkshops) {
       await pool
         .request()
+        .input("UserId", sql.Int, userId)
         .input("WorkshopName", sql.NVarChar, workshopname)
-        .input("UserId", sql.Int, userid)
-        .query(`INSERT INTO UserWorkshop (UserId, WorkshopName) VALUES (@UserId, @WorkshopName),`)
-    })
+        .query("INSERT INTO UserWorkshop (UserId, WorkshopName) VALUES (@UserId, @WorkshopName)");
+    }
 
     console.log("User added:", result);
 
@@ -433,6 +423,7 @@ router.post("/add", async (req, res) => {
       status: 201,
       message: "User added successfully",
       data: {
+        UserId: userId,
         Username,
         Birthdate,
         City,
@@ -451,6 +442,7 @@ router.post("/add", async (req, res) => {
         HasCar,
         HasLicense,
         Status,
+        selectedWorkshops,
       },
     });
   } catch (error) {
@@ -458,5 +450,6 @@ router.post("/add", async (req, res) => {
     res.status(500).json({ status: 500, message: "Database Query Error" });
   }
 });
+
 
 module.exports = router;
