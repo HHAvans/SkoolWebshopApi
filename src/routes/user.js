@@ -227,67 +227,57 @@ router.put("/:id", async (req, res) => {
   console.log("PUT /user/:id");
 
   const userId = req.params.id;
-  const username = req.body.username;
-  const email = req.body.email;
-  const phoneNumber = req.body.phoneNumber;
-  const address = req.body.address;
-  const postalCode = req.body.postalCode;
-  const country = req.body.country;
-  const language = req.body.language;
-
-  let BTWNumber;
-  if (req.body.BTWNumber === null) {
-    BTWNumber = "NULL";
-  } else {
-    BTWNumber = req.body.BTWNumber;
-  }
-  let KVKNumber;
-  console.log(req.body.KVKNumber);
-  if (req.body.KVKNumber === null) {
-    KVKNumber = "NULL";
-  } else {
-    KVKNumber = req.body.KVKNumber;
-  }
-
-  const bankId = req.body.bankId;
-  const role = req.body.role;
-  const publicTransit = req.body.usesPublicTransit;
-  const hasCar = req.body.hasCar;
-  const hasLicense = req.body.hasLicense;
-  const status = req.body.status;
-
-  console.log(userId);
+  const {
+    username,
+    email,
+    phoneNumber,
+    address,
+    postalCode,
+    country,
+    language,
+    BTWNumber,
+    KVKNumber,
+    bankId,
+    role,
+    usesPublicTransit,
+    hasCar,
+    hasLicense,
+    status
+  } = req.body;
 
   try {
     const pool = await poolPromise;
-    const query = `UPDATE "User"
-        SET 
-            UserName = '${username}',
-            Email = '${email}',
-            PhoneNumber = '${phoneNumber}',
-            Address = '${address}',
-            PostalCode = '${postalCode}',
-            Country = '${country}',
-            Language = '${language}',
-            BTWNumber = ${BTWNumber},
-            KVKNumber = ${KVKNumber},
-            BankId = '${bankId}',
-            role = '${role}',
-            UsesPublicTransit = '${publicTransit}',
-            HasCar = '${hasCar}',
-            HasLicense = '${hasLicense}',
-            Status = '${status}' 
-        WHERE 
-        [UserId] = ${userId}`;
+    const query = `
+      UPDATE "User"
+      SET 
+        UserName = '${username}',
+        Email = '${email}',
+        PhoneNumber = '${phoneNumber}',
+        Address = '${address}',
+        PostalCode = '${postalCode}',
+        Country = '${country}',
+        Language = '${language}',
+        BTWNumber = ${BTWNumber || 'NULL'},  -- Handle null or undefined values for BTWNumber
+        KVKNumber = ${KVKNumber || 'NULL'},  -- Handle null or undefined values for KVKNumber
+        BankId = '${bankId}',
+        Role = '${role}',
+        UsesPublicTransit = '${usesPublicTransit}',
+        HasCar = '${hasCar}',
+        HasLicense = '${hasLicense}',
+        Status = '${status}' 
+      WHERE 
+        UserId = ${userId}`;
+    
     console.log("EXECUTING QUERY ON DATABASE:", query);
     const result = await pool.request().query(query);
+
     res.json({
       status: 200,
       message: "User updated",
-      data: result,
+      data: result.rowsAffected  // Return the number of rows affected
     });
   } catch (error) {
-    console.error("database query error:", error);
+    console.error("Database query error:", error);
     res.status(500).json({ error: "Database Query Error" });
   }
 });
@@ -343,64 +333,98 @@ router.post("/changeRole", async (req, res) => {
   }
 });
 
-//for adding user
+//Add user
 router.post("/add", async (req, res) => {
   console.log("POST /user/add");
   console.log("Request body:", req.body);
 
   const {
     Username,
-    Email,
-    Role,
     Birthdate,
+    City,
+    Address,
+    Email,
     Password,
     PhoneNumber,
-    Address,
     PostalCode,
     Country,
     Language,
     BTWNumber,
     KVKNumber,
     BankId,
+    Role,
+    SalaryPerHourInEuro,
+    UsesPublicTransit,
+    HasCar,
+    HasLicense,
+    Status,
   } = req.body;
 
-  if (!Username || !Email || !Password) {
+  // Validate required fields
+  if (
+    !Username ||
+    !Birthdate ||
+    !City ||
+    !Address ||
+    !Email ||
+    !Password ||
+    !PhoneNumber ||
+    !PostalCode ||
+    !Country ||
+    !Language ||
+    !BankId ||
+    !Role
+  ) {
     return res.status(400).json({
       status: 400,
-      message: "Username, Email and Password are required",
+      message: "Required fields are missing",
+    });
+  }
+
+  // Additional validation for ZZP role
+  if (Role === "ZZP" && (!BTWNumber || !KVKNumber)) {
+    return res.status(400).json({
+      status: 400,
+      message: "BTWNumber and KVKNumber are required for ZZP role",
     });
   }
 
   try {
     const pool = await poolPromise;
     const query = `
-            INSERT INTO [User] (
-                Username, Email, Password, Birthdate, Role, PhoneNumber, Address, PostalCode,
-                Country, Language, BTWNumber, KVKNumber, BankId, UsesPublicTransit,
-                HasCar, HasLicense, Status
-            )
-            VALUES (
-                @Username, @Email, @Password, @Role, @PhoneNumber, @Address, @PostalCode,
-                @Country, @Language, @BTWNumber, @KVKNumber, @BankId, @UsesPublicTransit,
-                @HasCar, @HasLicense, @Status
-            )
-        `;
+      INSERT INTO "User" (
+        Username, Birthdate, City, Address, Email, Password, PhoneNumber, PostalCode,
+        Country, Language, BTWNumber, KVKNumber, BankId, Role, Permission, SalaryPerHourInEuro,
+        UsesPublicTransit, HasCar, HasLicense, Status
+      )
+      VALUES (
+        @Username, @Birthdate, @City, @Address, @Email, @Password, @PhoneNumber, @PostalCode,
+        @Country, @Language, @BTWNumber, @KVKNumber, @BankId, @Role, 'Default', @SalaryPerHourInEuro,
+        @UsesPublicTransit, @HasCar, @HasLicense, @Status
+      )
+    `;
 
     const result = await pool
       .request()
-      .input("Username", sql.VarChar, Username)
-      .input("Email", sql.VarChar, Email)
-      .input("Role", sql.VarChar, Role)
-      .input("Birthdate", sql.VarChar, Birthdate)
-      .input("Password", sql.VarChar, Password)
-      .input("PhoneNumber", sql.VarChar, PhoneNumber)
-      .input("Address", sql.VarChar, Address)
-      .input("PostalCode", sql.VarChar, PostalCode)
-      .input("Country", sql.VarChar, Country)
-      .input("Language", sql.VarChar, Language)
-      .input("BTWNumber", sql.VarChar, BTWNumber)
-      .input("KVKNumber", sql.VarChar, KVKNumber)
-      .input("BankId", sql.VarChar, BankId)
+      .input("Username", sql.NVarChar, Username)
+      .input("Birthdate", sql.Date, Birthdate)
+      .input("City", sql.NVarChar, City)
+      .input("Address", sql.NVarChar, Address)
+      .input("Email", sql.NVarChar, Email)
+      .input("Password", sql.NVarChar, Password)
+      .input("PhoneNumber", sql.NVarChar, PhoneNumber)
+      .input("PostalCode", sql.NVarChar, PostalCode)
+      .input("Country", sql.NVarChar, Country)
+      .input("Language", sql.NVarChar, Language)
+      .input("BTWNumber", sql.Int, BTWNumber)
+      .input("KVKNumber", sql.Int, KVKNumber)
+      .input("BankId", sql.NVarChar, BankId)
+      .input("Role", sql.NVarChar, Role)
+      .input("SalaryPerHourInEuro", sql.Decimal, SalaryPerHourInEuro)
+      .input("UsesPublicTransit", sql.Bit, UsesPublicTransit)
+      .input("HasCar", sql.Bit, HasCar)
+      .input("HasLicense", sql.Bit, HasLicense)
+      .input("Status", sql.NVarChar, Status)
       .query(query);
 
     console.log("User added:", result);
@@ -410,17 +434,23 @@ router.post("/add", async (req, res) => {
       message: "User added successfully",
       data: {
         Username,
-        Email,
-        Role,
         Birthdate,
-        PhoneNumber,
+        City,
         Address,
+        Email,
+        PhoneNumber,
         PostalCode,
         Country,
         Language,
         BTWNumber,
         KVKNumber,
         BankId,
+        Role,
+        SalaryPerHourInEuro,
+        UsesPublicTransit,
+        HasCar,
+        HasLicense,
+        Status,
       },
     });
   } catch (error) {

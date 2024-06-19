@@ -177,7 +177,7 @@ router.post("/add", async (req, res) => {
         .input('CommissionId', sql.Int, commissionId)
         .input('WorkshopId', sql.Int, workshopId)
         .input('MaxUsers', sql.Int, workshop.maxusers)
-        .input('NumberOfParticipants', sql.Int, workshop.numberofparticipents)
+        .input('NumberOfParticipants', sql.Int, workshop.numberofparticipants)
         .input('Level', sql.NVarChar(255), workshop.level)
         .input('StartTime', sql.DateTime, `1970-01-01 ${workshop.starttime}`)
         .input('EndTime', sql.DateTime, `1970-01-01 ${workshop.endtime}`)
@@ -202,23 +202,25 @@ router.get("/status/unassigned", async (req, res) => {
     const pool = await poolPromise;
     const query = `
     SELECT 
-    cwu.UserId,
-    cwu.CommissionWorkshopId,
-    cw.CommissionId,
-    w.WorkshopName,
-    w.Category,
-    c.ClientName,
-    c.ClientId AS Client_ClientId
+    CommissionWorkshop.CommissionWorkshopId,
+    CommissionWorkshopUser.UserId,
+    Workshop.WorkshopName,
+    Workshop.Category,
+    Client.ClientName,
+    CommissionWorkshop.Location,
+    [User].Username
 FROM 
-    CommissionWorkshopUser cwu
+    CommissionWorkshopUser
 INNER JOIN 
-    CommissionWorkshop cw ON cwu.CommissionWorkshopId = cw.CommissionWorkshopId
+    CommissionWorkshop ON CommissionWorkshopUser.CommissionWorkshopId = CommissionWorkshop.CommissionWorkshopId
 INNER JOIN 
-    Workshop w ON cw.WorkshopId = w.WorkshopId
+    Workshop ON CommissionWorkshop.WorkshopId = Workshop.WorkshopId
+INNER JOIN 
+    Client ON CommissionWorkshop.CommissionId = Client.ClientId
 LEFT JOIN 
-    Client c ON cw.CommissionId = c.ClientId
+    [User] ON CommissionWorkshopUser.UserId = [User].UserId
 WHERE 
-    cwu.Status = 'Afwachtend';
+    CommissionWorkshopUser.Status = 'Afwachtend'
     `;
 
     console.log("EXECUTING QUERY ON DATABASE: " + query);
