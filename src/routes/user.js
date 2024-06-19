@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { sql, poolPromise } = require("../dao/sqldao.js");
+const bcrypt = require('bcryptjs');
 
 /** Get users route
  * 
@@ -367,6 +368,9 @@ router.post("/add", async (req, res) => {
     });
   }
 
+  // Convert password to hashed password
+  const hashedPassword = bcrypt.hashSync(Password, bcrypt.genSaltSync(10));
+
   try {
     const pool = await poolPromise;
     const query = `
@@ -390,7 +394,7 @@ router.post("/add", async (req, res) => {
       .input("City", sql.NVarChar, City)
       .input("Address", sql.NVarChar, Address)
       .input("Email", sql.NVarChar, Email)
-      .input("Password", sql.NVarChar, Password)
+      .input("Password", sql.NVarChar, hashedPassword)
       .input("PhoneNumber", sql.NVarChar, PhoneNumber)
       .input("PostalCode", sql.NVarChar, PostalCode)
       .input("Country", sql.NVarChar, Country)
