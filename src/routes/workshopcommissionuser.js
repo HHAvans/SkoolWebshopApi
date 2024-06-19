@@ -190,6 +190,12 @@ router.get('/:userId', async (req, res) => {
                 data: result.recordset,
                 message: "Submissions retrieved successfully"
             });
+        } else if (result.recordset && result.recordset.length === 0){
+            res.status(200).json({
+                status: 200,
+                data: [],
+                message: "No submissions found"
+            });
         } else {
             res.status(404).json({
                 status: 404,
